@@ -10,12 +10,6 @@ export default function Header() {
         </Link>
         <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
           <Link
-            href="/#calculator"
-            className="hover:text-yellow-300 transition-colors"
-          >
-            Free Estimate
-          </Link>
-          <Link
             href="/moving-cost"
             className="hover:text-yellow-300 transition-colors"
           >

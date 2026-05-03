@@ -20,9 +20,6 @@ export default function Footer() {
             <li>
               <Link href="/#calculator" className="hover:text-white">Free Estimate Tool</Link>
             </li>
-            <li>
-              <Link href="/admin" className="hover:text-white">Admin Dashboard</Link>
-            </li>
           </ul>
         </div>
         <div>

@@ -4,12 +4,12 @@ import { useState, useEffect } from 'react';
 
 interface ActivityLog {
   id: string;
-  timestamp: string;
-  userId?: string;
-  email?: string;
+  createdAt: string;
+  userId: string;
+  userEmail: string;
   action: string;
-  details?: string;
-  ip?: string;
+  resource: string;
+  details: string;
 }
 
 function formatDate(iso: string) {
@@ -29,7 +29,7 @@ export default function ActivityLogsPage() {
   }, []);
 
   const filtered = logs.filter(l =>
-    !search || [l.action, l.email, l.details, l.ip].some(v => v?.toLowerCase().includes(search.toLowerCase()))
+    !search || [l.action, l.userEmail, l.details, l.resource].some(v => v?.toLowerCase().includes(search.toLowerCase()))
   );
 
   return (
@@ -58,20 +58,20 @@ export default function ActivityLogsPage() {
                 <th className="text-left px-4 py-3 whitespace-nowrap">Timestamp</th>
                 <th className="text-left px-4 py-3">User</th>
                 <th className="text-left px-4 py-3">Action</th>
+                <th className="text-left px-4 py-3">Resource</th>
                 <th className="text-left px-4 py-3">Details</th>
-                <th className="text-left px-4 py-3">IP</th>
               </tr>
             </thead>
             <tbody>
               {filtered.map(log => (
                 <tr key={log.id} className="border-t border-slate-600 text-slate-300">
-                  <td className="px-4 py-3 text-slate-400 whitespace-nowrap text-xs">{formatDate(log.timestamp)}</td>
-                  <td className="px-4 py-3 text-xs">{log.email ?? log.userId ?? '—'}</td>
+                  <td className="px-4 py-3 text-slate-400 whitespace-nowrap text-xs">{formatDate(log.createdAt)}</td>
+                  <td className="px-4 py-3 text-xs">{log.userEmail ?? log.userId ?? '—'}</td>
                   <td className="px-4 py-3">
                     <span className="px-2 py-0.5 rounded text-xs font-medium bg-slate-600 text-slate-200">{log.action}</span>
                   </td>
+                  <td className="px-4 py-3 text-slate-400 text-xs">{log.resource ?? '—'}</td>
                   <td className="px-4 py-3 text-slate-400 text-xs">{log.details ?? '—'}</td>
-                  <td className="px-4 py-3 text-slate-400 text-xs font-mono">{log.ip ?? '—'}</td>
                 </tr>
               ))}
             </tbody>

@@ -1,2 +1,2 @@
 # smart-moving
-Smart moving
+Smart Moving

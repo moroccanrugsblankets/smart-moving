@@ -1,5 +1,6 @@
 import { prisma } from './prisma';
 import { Role, PostStatus, EmailStatus, EncryptionType } from '@/generated/prisma/enums';
+import type { Prisma } from '@/generated/prisma/client';
 
 // ─── Re-exported enums for consumers ─────────────────────────────────────────
 export { Role, PostStatus, EmailStatus, EncryptionType };
@@ -695,8 +696,7 @@ export const marketRatesStore = {
     return row.marketRates as Record<string, unknown>;
   },
   save: async (data: Record<string, unknown>): Promise<void> => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const jsonData = data as any;
+    const jsonData = data as Prisma.InputJsonValue;
     await prisma.setting.upsert({
       where: { id: 1 },
       update: { marketRates: jsonData },

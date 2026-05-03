@@ -26,5 +26,5 @@ export async function addLead(lead: Omit<Lead, 'id' | 'createdAt'>): Promise<Lea
 }
 
 export async function getLeads(): Promise<Lead[]> {
-  return leadsFileStore.getAll();
+  return await leadsFileStore.getAll();
 }

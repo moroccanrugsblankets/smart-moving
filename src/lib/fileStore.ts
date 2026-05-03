@@ -147,7 +147,7 @@ function getDefaultUsers(): AdminUser[] {
   return [
     {
       id: crypto.randomUUID(),
-      email: 'admin@smartmoving.com',
+      email: 'admin@getmovecost.com',
       name: 'Admin',
       role: 'admin',
       passwordHash,
@@ -157,12 +157,12 @@ function getDefaultUsers(): AdminUser[] {
 }
 
 const defaultSettings: Settings = {
-  companyName: 'SmartMoving.com',
+  companyName: 'GetMoveCost.com',
   tagline: 'Free Moving & Cleaning Cost Estimator',
   logoUrlHeader: '',
   logoUrlFooter: '',
   faviconUrl: '',
-  adminEmail: 'admin@smartmoving.com',
+  adminEmail: 'admin@getmovecost.com',
   socialLinks: {},
 };
 

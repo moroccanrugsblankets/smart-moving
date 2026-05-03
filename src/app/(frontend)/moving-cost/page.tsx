@@ -3,7 +3,7 @@ import marketRates from '@/data/market_rates.json';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Moving Cost by City — SmartMoving.com',
+  title: 'Moving Cost by City — GetMoveCost.com',
   description: 'Browse moving cost estimates for 100+ US cities based on real 2026 market data.',
 };
 

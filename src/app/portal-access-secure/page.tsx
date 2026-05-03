@@ -45,7 +45,7 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         <div className="bg-slate-800 rounded-lg shadow-xl p-8 border border-slate-700">
           <div className="text-center mb-8">
-            <h1 className="text-2xl font-bold text-white">SmartMoving.com</h1>
+            <h1 className="text-2xl font-bold text-white">GetMoveCost.com</h1>
             <p className="text-slate-400 text-sm mt-1">Administration Portal</p>
           </div>
 

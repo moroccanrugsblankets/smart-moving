@@ -15,8 +15,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'SMTP not configured' }, { status: 400 });
   }
 
-  const subject = 'Test Email from SmartMoving Admin';
-  const content = `<p>This is a test email sent from the SmartMoving.com admin panel.</p><p>If you received this, SMTP is configured correctly.</p>`;
+  const subject = 'Test Email from GetMoveCost Admin';
+  const content = `<p>This is a test email sent from the GetMoveCost.com admin panel.</p><p>If you received this, SMTP is configured correctly.</p>`;
 
   try {
     const transporter = nodemailer.createTransport({

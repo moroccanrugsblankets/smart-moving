@@ -3,6 +3,8 @@ import CredentialsProvider from 'next-auth/providers/credentials';
 import bcrypt from 'bcryptjs';
 import { usersStore } from './fileStore';
 import { logActivity } from './activityLogger';
+import { checkRateLimit, recordFailedAttempt, resetAttempts } from './rateLimiter';
+import { headers } from 'next/headers';
 
 export const authOptions: AuthOptions = {
   providers: [
@@ -15,12 +17,32 @@ export const authOptions: AuthOptions = {
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
 
+        // Enforce rate limiting server-side using the real client IP from headers
+        const headersList = await headers();
+        const ip =
+          headersList.get('x-forwarded-for')?.split(',')[0].trim() ??
+          headersList.get('x-real-ip') ??
+          'unknown';
+
+        const { allowed } = checkRateLimit(ip);
+        if (!allowed) {
+          throw new Error('Too many attempts');
+        }
+
         const user = usersStore.findByEmail(credentials.email);
-        if (!user) return null;
+        if (!user) {
+          recordFailedAttempt(ip);
+          return null;
+        }
 
         const valid = await bcrypt.compare(credentials.password, user.passwordHash);
-        if (!valid) return null;
+        if (!valid) {
+          recordFailedAttempt(ip);
+          return null;
+        }
 
+        // Successful login: clear failed attempts and log activity
+        resetAttempts(ip);
         logActivity(user.id, user.email, 'LOGIN', 'auth', 'Successful login');
 
         return {

@@ -13,7 +13,12 @@ export async function middleware(request: NextRequest) {
 
   // Protect /backoffice routes
   if (pathname.startsWith('/backoffice')) {
-    const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
+    const secret = process.env.NEXTAUTH_SECRET;
+    if (!secret) {
+      console.error('NEXTAUTH_SECRET is not set — blocking access to /backoffice');
+      return NextResponse.redirect(new URL('/portal-access-secure', request.url));
+    }
+    const token = await getToken({ req: request, secret });
     if (!token) {
       return NextResponse.redirect(new URL('/portal-access-secure', request.url));
     }

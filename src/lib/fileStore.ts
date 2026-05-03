@@ -233,7 +233,8 @@ export const activityLogsStore = {
   add: (log: ActivityLog): void => {
     const logs = activityLogsStore.getAll();
     logs.unshift(log);
-    if (logs.length > 1000) logs.splice(1000);
+    const MAX_ACTIVITY_LOGS = 1000;
+    if (logs.length > MAX_ACTIVITY_LOGS) logs.splice(MAX_ACTIVITY_LOGS);
     activityLogsStore.save(logs);
   },
 };

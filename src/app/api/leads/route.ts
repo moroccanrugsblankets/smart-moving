@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { addLead, getLeads } from '@/lib/leadsStore';
+import { leadsFileStore } from '@/lib/fileStore';
 
 export async function POST(req: NextRequest) {
   try {
@@ -33,5 +34,16 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET() {
-  return NextResponse.json({ leads: getLeads() });
+  return NextResponse.json(getLeads());
+}
+
+export async function DELETE(req: NextRequest) {
+  try {
+    const { id } = await req.json();
+    if (!id) return NextResponse.json({ error: 'Missing id' }, { status: 400 });
+    leadsFileStore.deleteById(id);
+    return NextResponse.json({ ok: true });
+  } catch {
+    return NextResponse.json({ error: 'Server error' }, { status: 500 });
+  }
 }

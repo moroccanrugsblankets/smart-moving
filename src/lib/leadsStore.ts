@@ -1,3 +1,5 @@
+import { leadsFileStore } from './fileStore';
+
 export interface Lead {
   id: string;
   firstName: string;
@@ -13,18 +15,16 @@ export interface Lead {
   createdAt: string;
 }
 
-const leads: Lead[] = [];
-
 export function addLead(lead: Omit<Lead, 'id' | 'createdAt'>): Lead {
   const newLead: Lead = {
     ...lead,
     id: crypto.randomUUID(),
     createdAt: new Date().toISOString(),
   };
-  leads.push(newLead);
+  leadsFileStore.add(newLead);
   return newLead;
 }
 
 export function getLeads(): Lead[] {
-  return [...leads];
+  return leadsFileStore.getAll();
 }

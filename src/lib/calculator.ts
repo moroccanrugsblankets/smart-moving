@@ -1,4 +1,13 @@
-import marketRates from '@/data/market_rates.json';
+import staticMarketRates from '@/data/market_rates.json';
+import { marketRatesStore } from './fileStore';
+
+type MarketRates = typeof staticMarketRates;
+
+function getMarketRates(): MarketRates {
+  const dynamic = marketRatesStore.get();
+  if (dynamic) return dynamic as unknown as MarketRates;
+  return staticMarketRates;
+}
 
 export interface MovingInput {
   homeSize: 'studio' | '1br' | '2br' | '3br' | '4br';
@@ -24,11 +33,13 @@ export interface EstimateResult {
 }
 
 function getMultiplier(stateCode: string): number {
+  const marketRates = getMarketRates();
   const states = marketRates.stateMultipliers as Record<string, { multiplier: number }>;
   return states[stateCode.toUpperCase()]?.multiplier ?? 1.0;
 }
 
 export function calculateMoving(input: MovingInput): EstimateResult {
+  const marketRates = getMarketRates();
   const { baseRates, volumeConstants, complexityFactors } = marketRates;
   const vol = volumeConstants[input.homeSize as keyof typeof volumeConstants];
   const stateMultiplier =
@@ -62,6 +73,7 @@ export function calculateMoving(input: MovingInput): EstimateResult {
 }
 
 export function calculateCleaning(input: CleaningInput): EstimateResult {
+  const marketRates = getMarketRates();
   const { baseRates } = marketRates;
   const stateMultiplier = getMultiplier(input.state);
   const base =

@@ -417,7 +417,7 @@ export default function Calculator() {
                   🎯 Get Guaranteed Quotes — Free
                 </button>
                 <p className="text-xs text-slate-400 leading-relaxed text-center">
-                  By clicking, I consent to receive calls and/or SMS from SmartMoving.com and its
+                  By clicking, I consent to receive calls and/or SMS from GetMoveCost.com and its
                   affiliated partners regarding moving services, even if my number is on a
                   Do-Not-Call registry (TCPA). Consent is not a condition of purchase. Msg &amp;
                   data rates may apply.

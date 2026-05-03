@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Terms of Service — SmartMoving.com',
+  title: 'Terms of Service — GetMoveCost.com',
 };
 
 export default function TermsPage() {
@@ -13,14 +13,14 @@ export default function TermsPage() {
         <section>
           <h2 className="text-lg font-bold text-slate-800 mb-2">1. Use of the Tool</h2>
           <p>
-            SmartMoving.com provides cost estimation tools for informational purposes only.
+            GetMoveCost.com provides cost estimation tools for informational purposes only.
             Estimates are not guaranteed prices.
           </p>
         </section>
         <section>
           <h2 className="text-lg font-bold text-slate-800 mb-2">2. No Guarantee</h2>
           <p>
-            Actual moving or cleaning costs may differ from estimates. SmartMoving.com is not
+            Actual moving or cleaning costs may differ from estimates. GetMoveCost.com is not
             responsible for any discrepancy between the estimate and the actual price charged by a
             service provider.
           </p>
@@ -29,7 +29,7 @@ export default function TermsPage() {
           <h2 className="text-lg font-bold text-slate-800 mb-2">3. Third-Party Partners</h2>
           <p>
             By requesting quotes, you agree to be contacted by our partner moving companies.
-            SmartMoving.com is a lead generation platform and does not directly provide moving or
+            GetMoveCost.com is a lead generation platform and does not directly provide moving or
             cleaning services.
           </p>
         </section>

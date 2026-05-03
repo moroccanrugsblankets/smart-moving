@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next';
 import marketRates from '@/data/market_rates.json';
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://smartmoving.com';
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://getmovecost.com';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const cityRoutes: MetadataRoute.Sitemap = marketRates.topCities.map(city => ({

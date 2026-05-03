@@ -5,7 +5,7 @@ export default function Footer() {
     <footer className="bg-slate-800 text-slate-300 text-sm mt-16">
       <div className="max-w-6xl mx-auto px-4 py-10 grid md:grid-cols-3 gap-8">
         <div>
-          <p className="font-bold text-white mb-2">SmartMoving.com</p>
+          <p className="font-bold text-white mb-2">GetMoveCost.com</p>
           <p className="text-xs leading-relaxed">
             Cost estimates are based on U.S. Bureau of Labor Statistics data and regional market
             surveys (2026). Actual prices may vary.
@@ -40,7 +40,7 @@ export default function Footer() {
         </div>
       </div>
       <div className="border-t border-slate-700 text-center py-4 text-xs text-slate-500">
-        © 2026 SmartMoving.com. All rights reserved. |{' '}
+        © 2026 GetMoveCost.com. All rights reserved. |{' '}
         <a
           href="https://www.bls.gov"
           target="_blank"

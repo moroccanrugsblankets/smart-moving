@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Do Not Sell My Personal Information — SmartMoving.com',
+  title: 'Do Not Sell My Personal Information — GetMoveCost.com',
 };
 
 export default function DoNotSellPage() {
@@ -15,11 +15,11 @@ export default function DoNotSellPage() {
         opt out of the sale of their personal information.
       </p>
       <p className="text-slate-600 mb-4">
-        SmartMoving.com may share lead information with affiliated moving service partners. If you
+        GetMoveCost.com may share lead information with affiliated moving service partners. If you
         are a California resident and wish to opt out, please contact us:
       </p>
       <div className="bg-slate-100 rounded-xl p-6 text-slate-700 text-sm space-y-2">
-        <p><strong>Email:</strong> privacy@smartmoving.com</p>
+        <p><strong>Email:</strong> privacy@getmovecost.com</p>
         <p><strong>Subject:</strong> CCPA Opt-Out Request</p>
       </div>
       <p className="text-slate-500 text-sm mt-6">

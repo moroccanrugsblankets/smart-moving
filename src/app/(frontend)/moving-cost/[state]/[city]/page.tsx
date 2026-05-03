@@ -29,7 +29,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const multiplier  = stateData?.multiplier ?? 1.0;
   const baseMoving  = Math.round(marketRates.baseRates.moving.hourlyRate * 8 * multiplier);
   return {
-    title: `Moving Cost in ${cityData.city}, ${cityData.state} (2026) — SmartMoving.com`,
+    title: `Moving Cost in ${cityData.city}, ${cityData.state} (2026) — GetMoveCost.com`,
     description: `How much does it cost to move in ${cityData.city}, ${cityData.state}? Average moving costs start around $${baseMoving.toLocaleString()} for a 2-bedroom in 2026. Get your free estimate.`,
   };
 }

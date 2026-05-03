@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Privacy Policy — SmartMoving.com',
+  title: 'Privacy Policy — GetMoveCost.com',
 };
 
 export default function PrivacyPage() {
@@ -29,7 +29,7 @@ export default function PrivacyPage() {
           <h2 className="text-lg font-bold text-slate-800 mb-2">3. TCPA Consent</h2>
           <p className="text-slate-600">
             By submitting a quote request, you consent to receive calls and/or SMS from
-            SmartMoving.com and affiliated partners. Standard message and data rates may apply.
+            GetMoveCost.com and affiliated partners. Standard message and data rates may apply.
             Consent is not a condition of purchase.
           </p>
         </section>
@@ -43,7 +43,7 @@ export default function PrivacyPage() {
         </section>
         <section>
           <h2 className="text-lg font-bold text-slate-800 mb-2">5. Contact</h2>
-          <p className="text-slate-600">For privacy inquiries: privacy@smartmoving.com</p>
+          <p className="text-slate-600">For privacy inquiries: privacy@getmovecost.com</p>
         </section>
       </div>
     </div>

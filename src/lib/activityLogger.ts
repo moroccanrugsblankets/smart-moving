@@ -7,8 +7,8 @@ export function logActivity(
   resource: string,
   details: string
 ): void {
-  try {
-    activityLogsStore.add({
+  activityLogsStore
+    .add({
       id: crypto.randomUUID(),
       userId,
       userEmail,
@@ -16,9 +16,9 @@ export function logActivity(
       resource,
       details,
       createdAt: new Date().toISOString(),
+    })
+    .catch(err => {
+      // Never break app flow on logging failures
+      console.error('[activityLogger] Failed to write activity log:', err);
     });
-  } catch (err) {
-    // Log to console so failures are visible but never break app flow
-    console.error('[activityLogger] Failed to write activity log:', err);
-  }
 }

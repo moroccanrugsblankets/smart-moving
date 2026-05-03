@@ -5,5 +5,5 @@ import { emailLogsStore } from '@/lib/fileStore';
 export async function GET(req: NextRequest) {
   const auth = await requireAuth(req);
   if (auth instanceof NextResponse) return auth;
-  return NextResponse.json(emailLogsStore.getAll());
+  return NextResponse.json(await emailLogsStore.getAll());
 }

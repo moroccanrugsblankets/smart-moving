@@ -7,7 +7,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   const auth = await requireAuth(req);
   if (auth instanceof NextResponse) return auth;
   const { id } = await params;
-  const post = blogStore.findById(id);
+  const post = await blogStore.findById(id);
   if (!post) return NextResponse.json({ error: 'Not found' }, { status: 404 });
   return NextResponse.json(post);
 }
@@ -17,15 +17,13 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   if (auth instanceof NextResponse) return auth;
   const { id } = await params;
 
-  const posts = blogStore.getAll();
-  const idx = posts.findIndex(p => p.id === id);
-  if (idx === -1) return NextResponse.json({ error: 'Not found' }, { status: 404 });
+  const existing = await blogStore.findById(id);
+  if (!existing) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
   const body = await req.json();
-  posts[idx] = { ...posts[idx], ...body, id, updatedAt: new Date().toISOString() };
-  blogStore.save(posts);
-  logActivity(auth.session.user.id, auth.session.user.email, 'UPDATE', 'blog', `Updated post: ${posts[idx].title}`);
-  return NextResponse.json(posts[idx]);
+  const updated = await blogStore.update(id, body);
+  logActivity(auth.session.user.id, auth.session.user.email, 'UPDATE', 'blog', `Updated post: ${updated.title}`);
+  return NextResponse.json(updated);
 }
 
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -33,8 +31,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
   if (auth instanceof NextResponse) return auth;
   const { id } = await params;
 
-  const posts = blogStore.getAll().filter(p => p.id !== id);
-  blogStore.save(posts);
+  await blogStore.deleteById(id);
   logActivity(auth.session.user.id, auth.session.user.email, 'DELETE', 'blog', `Deleted post id: ${id}`);
   return NextResponse.json({ ok: true });
 }

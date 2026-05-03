@@ -8,7 +8,7 @@ export async function GET(req: NextRequest) {
   const auth = await requireAuth(req, ['admin']);
   if (auth instanceof NextResponse) return auth;
 
-  const users = usersStore.getAll().map(({ passwordHash: _, ...u }) => u);
+  const users = (await usersStore.getAll()).map(({ passwordHash: _, ...u }) => u);
   return NextResponse.json(users);
 }
 
@@ -25,14 +25,17 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid role' }, { status: 400 });
   }
 
-  const existing = usersStore.findByEmail(email);
+  const existing = await usersStore.findByEmail(email);
   if (existing) return NextResponse.json({ error: 'Email already exists' }, { status: 409 });
 
   const passwordHash = await bcrypt.hash(password, 10);
-  const users = usersStore.getAll();
-  const newUser = { id: crypto.randomUUID(), email, name, role: role as 'admin' | 'manager', passwordHash, createdAt: new Date().toISOString() };
-  users.push(newUser);
-  usersStore.save(users);
+  const newUser = await usersStore.create({
+    id: crypto.randomUUID(),
+    email,
+    name,
+    role: role as 'admin' | 'manager',
+    passwordHash,
+  });
   logActivity(auth.session.user.id, auth.session.user.email, 'CREATE', 'users', `Created user: ${email}`);
 
   const { passwordHash: _, ...safeUser } = newUser;

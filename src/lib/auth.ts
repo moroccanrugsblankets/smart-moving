@@ -29,7 +29,7 @@ export const authOptions: AuthOptions = {
           throw new Error('Too many attempts');
         }
 
-        const user = usersStore.findByEmail(credentials.email);
+        const user = await usersStore.findByEmail(credentials.email);
         if (!user) {
           recordFailedAttempt(ip);
           return null;

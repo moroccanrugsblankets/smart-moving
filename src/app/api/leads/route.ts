@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const lead = addLead({
+    const lead = await addLead({
       firstName, lastName, email, phone, serviceDate,
       serviceType, originZip, destZip, homeSize, estimate,
     });
@@ -34,14 +34,14 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET() {
-  return NextResponse.json(getLeads());
+  return NextResponse.json(await getLeads());
 }
 
 export async function DELETE(req: NextRequest) {
   try {
     const { id } = await req.json();
     if (!id) return NextResponse.json({ error: 'Missing id' }, { status: 400 });
-    leadsFileStore.deleteById(id);
+    await leadsFileStore.deleteById(id);
     return NextResponse.json({ ok: true });
   } catch {
     return NextResponse.json({ error: 'Server error' }, { status: 500 });

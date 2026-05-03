@@ -15,16 +15,16 @@ export interface Lead {
   createdAt: string;
 }
 
-export function addLead(lead: Omit<Lead, 'id' | 'createdAt'>): Lead {
+export async function addLead(lead: Omit<Lead, 'id' | 'createdAt'>): Promise<Lead> {
   const newLead: Lead = {
     ...lead,
     id: crypto.randomUUID(),
     createdAt: new Date().toISOString(),
   };
-  leadsFileStore.add(newLead);
+  await leadsFileStore.add(newLead);
   return newLead;
 }
 
-export function getLeads(): Lead[] {
+export async function getLeads(): Promise<Lead[]> {
   return leadsFileStore.getAll();
 }

@@ -32,6 +32,19 @@ A Next.js 15 application providing a free moving & cleaning cost estimator for t
 # Install dependencies
 npm install --legacy-peer-deps
 
+# Copy and configure environment variables
+cp env.example .env.local
+# Edit .env.local — set DATABASE_URL, NEXTAUTH_SECRET, etc.
+
+# Generate Prisma client
+npm run db:generate
+
+# Apply database migrations
+npm run db:migrate
+
+# Seed the initial admin user (set INITIAL_ADMIN_PASSWORD first)
+npm run db:seed
+
 # Start development server (with Turbopack)
 npm run dev
 
@@ -50,16 +63,27 @@ The application runs at **http://localhost:3000** by default.
 
 Copy `env.example` to `.env.local` and fill in the values:
 
-```env
-# NextAuth
-NEXTAUTH_URL=https://getmovecost.com      # Base URL of your deployment
-NEXTAUTH_SECRET=your-secret-here          # Random string for JWT signing
-
-# Public base URL (used for sitemap, etc.)
-NEXT_PUBLIC_BASE_URL=https://getmovecost.com
-```
+| Variable | Required | Description |
+|---|---|---|
+| `DATABASE_URL` | ✅ Yes | Neon Postgres connection string — obtain from [neon.tech](https://neon.tech) |
+| `NEXTAUTH_SECRET` | ✅ Yes | Random string used to sign JWT session tokens |
+| `NEXTAUTH_URL` | ✅ Yes | Full public URL of your deployment (e.g. `https://getmovecost.com`) |
+| `NEXT_PUBLIC_BASE_URL` | ✅ Yes | Same as `NEXTAUTH_URL` — used for sitemap generation |
+| `INITIAL_ADMIN_PASSWORD` | Seed only | Password for the bootstrap admin account; only needed when running `npm run db:seed` |
 
 > **Tip:** Generate a secure `NEXTAUTH_SECRET` with `openssl rand -base64 32`.
+
+### Setting up the database
+
+```bash
+# 1. Apply migrations to a fresh Neon database
+npm run db:migrate
+
+# 2. Seed the initial admin account (requires INITIAL_ADMIN_PASSWORD)
+INITIAL_ADMIN_PASSWORD=your-secure-password npm run db:seed
+```
+
+After seeding, log in with `admin@getmovecost.com` and the password you set in `INITIAL_ADMIN_PASSWORD`. **Change the password immediately** in **Backoffice → Users**.
 
 ---
 
@@ -95,7 +119,7 @@ http://localhost:3000/portal-access-secure
 | Field | Value |
 |---|---|
 | **Email** | `admin@getmovecost.com` |
-| **Password** | `admin123` |
+| **Password** | *(value of `INITIAL_ADMIN_PASSWORD` set during `npm run db:seed`)* |
 
 > ⚠️ **Change the default password immediately after your first login.** Go to **Backoffice → Users** to update your account password.
 
@@ -245,19 +269,18 @@ The last **1 000** entries are retained.
 
 ## Data Storage
 
-All application data is stored as JSON files inside the `data/` directory at the project root:
+All application data is stored in a **Neon Postgres** database accessed via **Prisma ORM**.
 
-| File | Contents |
+| Table | Contents |
 |---|---|
-| `data/users.json` | Admin user accounts |
-| `data/settings.json` | Site settings |
-| `data/leads.json` | Contact form submissions |
-| `data/blog.json` | Blog posts |
-| `data/blog-categories.json` | Blog categories |
-| `data/pages.json` | Static page content |
-| `data/email-config.json` | SMTP configuration |
-| `data/email-logs.json` | Email send history |
-| `data/activity-logs.json` | Audit trail |
-| `data/market-rates.json` | Moving cost market-rate data |
+| `User` | Admin user accounts |
+| `Setting` | Site settings + market-rate data (singleton row) |
+| `Lead` | Contact form submissions |
+| `BlogPost` | Blog posts |
+| `BlogCategory` | Blog categories |
+| `Page` | Static page content |
+| `EmailConfig` | SMTP configuration (singleton row) |
+| `EmailLog` | Email send history |
+| `ActivityLog` | Audit trail (last 1 000 entries served) |
 
-> The `data/` directory is created automatically on first run. Back it up regularly in production.
+> The Prisma schema lives in `prisma/schema.prisma`. Run `npm run db:migrate` to apply schema changes to the database.

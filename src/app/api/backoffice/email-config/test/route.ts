@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
   const { to } = await req.json();
   if (!to) return NextResponse.json({ error: 'Recipient email required' }, { status: 400 });
 
-  const config = emailConfigStore.get();
+  const config = await emailConfigStore.get();
   if (!config.host || !config.username) {
     return NextResponse.json({ error: 'SMTP not configured' }, { status: 400 });
   }
@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
       html: content,
     });
 
-    emailLogsStore.add({
+    await emailLogsStore.add({
       id: crypto.randomUUID(),
       to,
       subject,
@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true });
   } catch (err) {
     const error = err instanceof Error ? err.message : 'Unknown error';
-    emailLogsStore.add({
+    await emailLogsStore.add({
       id: crypto.randomUUID(),
       to,
       subject,

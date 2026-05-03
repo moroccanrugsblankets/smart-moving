@@ -5,5 +5,5 @@ import { activityLogsStore } from '@/lib/fileStore';
 export async function GET(req: NextRequest) {
   const auth = await requireAuth(req, ['admin']);
   if (auth instanceof NextResponse) return auth;
-  return NextResponse.json(activityLogsStore.getAll());
+  return NextResponse.json(await activityLogsStore.getAll());
 }

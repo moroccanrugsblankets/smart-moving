@@ -3,15 +3,13 @@ import { requireAuth } from '@/lib/apiAuth';
 import { emailConfigStore } from '@/lib/fileStore';
 import { logActivity } from '@/lib/activityLogger';
 
-// Sentinel used to indicate "password unchanged" from client — must not be a valid password
-const PASSWORD_UNCHANGED_SENTINEL = '__UNCHANGED_PASSWORD_SENTINEL__';
-
 export async function GET(req: NextRequest) {
   const auth = await requireAuth(req, ['admin']);
   if (auth instanceof NextResponse) return auth;
   const config = emailConfigStore.get();
-  // Return sentinel instead of actual password so it is never sent over the wire
-  return NextResponse.json({ ...config, password: config.password ? PASSWORD_UNCHANGED_SENTINEL : '' });
+  // Never return the actual password over the wire; use a boolean flag instead
+  const { password, ...rest } = config;
+  return NextResponse.json({ ...rest, passwordSet: Boolean(password) });
 }
 
 export async function POST(req: NextRequest) {
@@ -20,9 +18,13 @@ export async function POST(req: NextRequest) {
 
   const body = await req.json();
   const existing = emailConfigStore.get();
-  // If client echoes back the sentinel, keep the existing password
-  const password = body.password === PASSWORD_UNCHANGED_SENTINEL ? existing.password : body.password;
-  emailConfigStore.save({ ...body, password });
+  // Only update password when a new non-empty value is explicitly provided
+  const password = typeof body.newPassword === 'string' && body.newPassword.length > 0
+    ? body.newPassword
+    : existing.password;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { newPassword, passwordSet, ...fields } = body;
+  emailConfigStore.save({ ...fields, password });
   logActivity(auth.session.user.id, auth.session.user.email, 'UPDATE', 'email-config', 'Updated SMTP config');
   return NextResponse.json({ ok: true });
 }

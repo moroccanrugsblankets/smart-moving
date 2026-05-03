@@ -7,13 +7,14 @@ interface EmailConfig {
   host: string;
   port: number;
   username: string;
-  password: string;
+  newPassword: string;   // Only sent when user wants to update the password
   fromEmail: string;
   encryption: 'SSL' | 'TLS' | 'none';
+  passwordSet?: boolean; // Returned from API: whether a password is already stored
 }
 
 export default function EmailConfigPage() {
-  const [config, setConfig] = useState<EmailConfig>({ host: '', port: 587, username: '', password: '', fromEmail: '', encryption: 'TLS' });
+  const [config, setConfig] = useState<EmailConfig>({ host: '', port: 587, username: '', newPassword: '', fromEmail: '', encryption: 'TLS' });
   const [saving, setSaving] = useState(false);
   const [testEmail, setTestEmail] = useState('');
   const [showTestModal, setShowTestModal] = useState(false);
@@ -23,7 +24,7 @@ export default function EmailConfigPage() {
   useEffect(() => {
     fetch('/api/backoffice/email-config')
       .then(r => r.ok ? r.json() : null)
-      .then(data => { if (data) setConfig(data); });
+      .then(data => { if (data) setConfig(prev => ({ ...prev, ...data, newPassword: '' })); });
   }, []);
 
   async function handleSubmit(e: FormEvent) {
@@ -101,9 +102,13 @@ export default function EmailConfigPage() {
               className="w-full px-3 py-2 bg-slate-600 border border-slate-500 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
           </div>
           <div>
-            <label className="block text-slate-400 text-sm mb-1">Password</label>
-            <input type="password" value={config.password} onChange={e => set('password', e.target.value)}
+            <label className="block text-slate-400 text-sm mb-1">
+              Password
+              {config.passwordSet && <span className="ml-2 text-xs text-green-400">(password already set — leave blank to keep it)</span>}
+            </label>
+            <input type="password" value={config.newPassword} onChange={e => set('newPassword', e.target.value)}
               autoComplete="new-password"
+              placeholder={config.passwordSet ? '••••••••' : 'Enter SMTP password'}
               className="w-full px-3 py-2 bg-slate-600 border border-slate-500 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
           </div>
           <div>

@@ -15,6 +15,34 @@ interface MarketRates {
   topCities?: string[];
 }
 
+interface BaseRateFlat {
+  moving: { hourlyRate: number; description: string };
+  cleaning: { perSqFt: number; fixedServiceFee: number; description: string };
+  distanceSurchargePerMile: number;
+  gasSurcharge: number;
+}
+
+/** Read a nested baseRates value by path (length 2 or 3). */
+function getBaseRate(br: BaseRateFlat, path: string[]): number {
+  if (path.length === 3) {
+    const sub = br[path[1] as keyof BaseRateFlat];
+    if (sub && typeof sub === 'object') return (sub as unknown as Record<string, number>)[path[2]] ?? 0;
+  }
+  return (br as unknown as Record<string, number>)[path[1]] ?? 0;
+}
+
+/** Write a nested baseRates value by path (length 2 or 3). Returns new baseRates object. */
+function setBaseRate(br: BaseRateFlat, path: string[], val: number): BaseRateFlat {
+  const next: BaseRateFlat = JSON.parse(JSON.stringify(br)) as BaseRateFlat;
+  if (path.length === 3) {
+    const sub = next[path[1] as keyof BaseRateFlat];
+    if (sub && typeof sub === 'object') (sub as unknown as Record<string, number>)[path[2]] = val;
+  } else {
+    (next as unknown as Record<string, number>)[path[1]] = val;
+  }
+  return next;
+}
+
 type TabId = 'base' | 'states' | 'cities' | 'volume';
 
 export default function MarketDataPage() {
@@ -102,22 +130,12 @@ export default function MarketDataPage() {
                 <input
                   type="number"
                   step="0.01"
-                  value={
-                    field.key.length === 3
-                      ? (data.baseRates as unknown as Record<string, Record<string, number>>)[field.key[1]][field.key[2]]
-                      : (data.baseRates as unknown as Record<string, number>)[field.key[1]]
-                  }
+                  value={getBaseRate(data.baseRates, field.key)}
                   onChange={e => {
                     const val = parseFloat(e.target.value);
                     setData(prev => {
                       if (!prev) return prev;
-                      const next = JSON.parse(JSON.stringify(prev)) as MarketRates;
-                      if (field.key.length === 3) {
-                        (next.baseRates as unknown as Record<string, Record<string, number>>)[field.key[1]][field.key[2]] = val;
-                      } else {
-                        (next.baseRates as unknown as Record<string, number>)[field.key[1]] = val;
-                      }
-                      return next;
+                      return { ...prev, baseRates: setBaseRate(prev.baseRates, field.key, val) };
                     });
                   }}
                   className="w-full px-3 py-2 bg-slate-600 border border-slate-500 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"

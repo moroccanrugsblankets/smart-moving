@@ -17,7 +17,8 @@ export function logActivity(
       details,
       createdAt: new Date().toISOString(),
     });
-  } catch {
-    // Silently fail — logging should never break app flow
+  } catch (err) {
+    // Log to console so failures are visible but never break app flow
+    console.error('[activityLogger] Failed to write activity log:', err);
   }
 }

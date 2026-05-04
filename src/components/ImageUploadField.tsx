@@ -7,9 +7,10 @@ interface ImageUploadFieldProps {
   value: string;
   onChange: (url: string) => void;
   accept?: string;
+  maxSizeMb?: number;
 }
 
-export default function ImageUploadField({ label, value, onChange, accept = 'image/*' }: ImageUploadFieldProps) {
+export default function ImageUploadField({ label, value, onChange, accept = 'image/*', maxSizeMb = 5 }: ImageUploadFieldProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
@@ -77,7 +78,7 @@ export default function ImageUploadField({ label, value, onChange, accept = 'ima
           >
             {uploading ? 'Uploading…' : value ? 'Replace Image' : 'Upload Image'}
           </button>
-          <span className="text-slate-400 text-xs">or drag & drop (max 5 MB)</span>
+          <span className="text-slate-400 text-xs">or drag & drop (max {maxSizeMb} MB)</span>
         </div>
 
         {error && <p className="text-red-400 text-xs">{error}</p>}

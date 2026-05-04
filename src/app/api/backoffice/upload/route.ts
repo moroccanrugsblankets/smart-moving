@@ -3,7 +3,15 @@ import { requireAuth } from '@/lib/apiAuth';
 import { writeFile, mkdir } from 'fs/promises';
 import path from 'path';
 
-const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml', 'image/x-icon'];
+const MIME_TO_EXT: Record<string, string> = {
+  'image/jpeg': 'jpg',
+  'image/png': 'png',
+  'image/gif': 'gif',
+  'image/webp': 'webp',
+  'image/svg+xml': 'svg',
+  'image/x-icon': 'ico',
+};
+
 const MAX_SIZE = 5 * 1024 * 1024; // 5 MB
 
 export async function POST(req: NextRequest) {
@@ -17,7 +25,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'No file provided' }, { status: 400 });
   }
 
-  if (!ALLOWED_TYPES.includes(file.type)) {
+  const ext = MIME_TO_EXT[file.type];
+  if (!ext) {
     return NextResponse.json({ error: 'Invalid file type. Allowed: JPEG, PNG, GIF, WebP, SVG, ICO' }, { status: 400 });
   }
 
@@ -28,7 +37,6 @@ export async function POST(req: NextRequest) {
   const bytes = await file.arrayBuffer();
   const buffer = Buffer.from(bytes);
 
-  const ext = file.name.split('.').pop()?.toLowerCase() ?? 'bin';
   const safeName = `${Date.now()}-${crypto.randomUUID().slice(0, 8)}.${ext}`;
   const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
 

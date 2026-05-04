@@ -733,13 +733,12 @@ export const marketRatesStore = {
 
 // ─── Default email templates ──────────────────────────────────────────────────
 
-const defaultEmailTemplates: Array<Omit<EmailTemplate, 'updatedAt'>> = [
+const defaultEmailTemplates: Array<{ id: string; key: string; name: string; subject: string; defaultContent: string; variables: string[] }> = [
   {
     id: 'tpl-lead-confirmation',
     key: 'lead_confirmation',
     name: 'Lead Confirmation',
     subject: 'Your moving estimate request – {{service}}',
-    htmlContent: '',
     defaultContent: `<p>Hi {{name}},</p>
 <p>Thank you for requesting a moving estimate. We have received your inquiry and will be in touch shortly.</p>
 <p><strong>Details:</strong></p>
@@ -756,7 +755,6 @@ const defaultEmailTemplates: Array<Omit<EmailTemplate, 'updatedAt'>> = [
     key: 'admin_notification',
     name: 'Admin Notification (New Lead)',
     subject: 'New lead received – {{name}}',
-    htmlContent: '',
     defaultContent: `<p>A new lead has been submitted.</p>
 <p><strong>Lead Details:</strong></p>
 <ul>
@@ -774,7 +772,6 @@ const defaultEmailTemplates: Array<Omit<EmailTemplate, 'updatedAt'>> = [
     key: 'receipt_acknowledgement',
     name: 'Receipt / Acknowledgement',
     subject: 'We received your request – {{company_name}}',
-    htmlContent: '',
     defaultContent: `<p>Hi {{name}},</p>
 <p>This is a confirmation that we have received your request. Our team will review it and contact you within 24 hours.</p>
 <p>Best regards,<br>{{company_name}}</p>`,

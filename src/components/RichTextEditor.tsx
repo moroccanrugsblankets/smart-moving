@@ -44,6 +44,9 @@ export default function RichTextEditor({ value, onChange, minHeight = 300 }: Ric
   }, [onChange]);
 
   function execCmd(cmd: string) {
+    // execCommand is deprecated but remains the only zero-dependency way to
+    // support inline formatting on contentEditable. All major browsers still
+    // implement it; it can be replaced with a proper WYSIWYG library if needed.
     document.execCommand(cmd, false);
     editorRef.current?.focus();
     handleInput();

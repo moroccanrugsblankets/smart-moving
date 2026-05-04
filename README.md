@@ -267,6 +267,20 @@ The last **1 000** entries are retained.
 
 ---
 
+## Deploying to Vercel
+
+Vercel automatically uses the `vercel-build` script when it is present in `package.json`. This script runs `prisma migrate deploy` before `next build`, which ensures all pending database migrations are applied to the production database on every deploy.
+
+**Required Vercel environment variable:**
+
+| Variable | Description |
+|---|---|
+| `DATABASE_URL` | Neon Postgres connection string for the production database |
+
+Make sure `DATABASE_URL` (and the other variables listed in [Environment Variables](#environment-variables)) are configured in **Vercel → Project → Settings → Environment Variables** before deploying.
+
+---
+
 ## Data Storage
 
 All application data is stored in a **Neon Postgres** database accessed via **Prisma ORM**.

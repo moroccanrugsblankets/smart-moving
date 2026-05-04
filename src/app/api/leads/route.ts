@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
         homeSize,
       },
       settings.adminEmail,
-    ).catch(() => {});
+    ).catch((err) => console.error('[emailService] Failed to send lead emails:', err));
 
     return NextResponse.json({ success: true, leadId: lead.id });
   } catch {

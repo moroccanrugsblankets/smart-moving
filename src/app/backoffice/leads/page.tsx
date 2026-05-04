@@ -12,6 +12,9 @@ interface Lead {
   serviceType: string;
   estimate?: string;
   serviceDate: string;
+  originZip?: string;
+  destZip?: string;
+  homeSize?: string;
   createdAt: string;
 }
 
@@ -25,6 +28,7 @@ export default function LeadsPage() {
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [viewLead, setViewLead] = useState<Lead | null>(null);
   const { toasts, addToast, removeToast } = useToast();
 
   useEffect(() => {
@@ -153,14 +157,22 @@ export default function LeadsPage() {
                     <td className="px-4 py-3">{lead.estimate ?? '—'}</td>
                     <td className="px-4 py-3">{lead.serviceDate}</td>
                     <td className="px-4 py-3 text-slate-400">{formatDate(lead.createdAt)}</td>
-                    <td className="px-4 py-3">
-                      <button
-                        onClick={() => setDeleteId(lead.id)}
-                        className="px-2 py-1 bg-red-600 hover:bg-red-700 text-white text-xs rounded"
-                      >
-                        Delete
-                      </button>
-                    </td>
+                     <td className="px-4 py-3">
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => setViewLead(lead)}
+                          className="px-2 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded"
+                        >
+                          View
+                        </button>
+                        <button
+                          onClick={() => setDeleteId(lead.id)}
+                          className="px-2 py-1 bg-red-600 hover:bg-red-700 text-white text-xs rounded"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                     </td>
                   </tr>
                 ))}
               </tbody>
@@ -194,6 +206,54 @@ export default function LeadsPage() {
       )}
 
       <Toast toasts={toasts} onRemove={removeToast} />
+
+      {/* Lead Detail Modal */}
+      {viewLead && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+          <div className="bg-slate-800 border border-slate-600 rounded-lg p-6 max-w-lg w-full mx-4">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-white font-semibold text-lg">Lead Details</h3>
+              <button onClick={() => setViewLead(null)} className="text-slate-400 hover:text-white text-xl leading-none">&times;</button>
+            </div>
+            <dl className="grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
+              <dt className="text-slate-400">Name</dt>
+              <dd className="text-white">{viewLead.firstName} {viewLead.lastName}</dd>
+              <dt className="text-slate-400">Email</dt>
+              <dd className="text-white break-all">{viewLead.email}</dd>
+              <dt className="text-slate-400">Phone</dt>
+              <dd className="text-white">{viewLead.phone}</dd>
+              <dt className="text-slate-400">Service Type</dt>
+              <dd className="text-white capitalize">{viewLead.serviceType}</dd>
+              <dt className="text-slate-400">Service Date</dt>
+              <dd className="text-white">{viewLead.serviceDate}</dd>
+              <dt className="text-slate-400">Estimate</dt>
+              <dd className="text-white">{viewLead.estimate ?? '—'}</dd>
+              <dt className="text-slate-400">Origin ZIP</dt>
+              <dd className="text-white">{viewLead.originZip ?? '—'}</dd>
+              <dt className="text-slate-400">Destination ZIP</dt>
+              <dd className="text-white">{viewLead.destZip ?? '—'}</dd>
+              <dt className="text-slate-400">Home Size</dt>
+              <dd className="text-white">{viewLead.homeSize ?? '—'}</dd>
+              <dt className="text-slate-400">Reference ID</dt>
+              <dd className="text-white font-mono text-xs">{viewLead.id}</dd>
+              <dt className="text-slate-400">Submitted</dt>
+              <dd className="text-white">{formatDate(viewLead.createdAt)}</dd>
+            </dl>
+            <div className="mt-5 flex justify-end gap-3">
+              <button
+                onClick={() => { setViewLead(null); setDeleteId(viewLead.id); }}
+                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm rounded"
+              >
+                Delete
+              </button>
+              <button onClick={() => setViewLead(null)}
+                className="px-4 py-2 bg-slate-600 hover:bg-slate-500 text-white text-sm rounded">
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
     });
 
     const settings = await settingsStore.get();
-    sendLeadEmails(
+    await sendLeadEmails(
       {
         name: `${firstName} ${lastName}`,
         email,
@@ -40,6 +40,7 @@ export async function POST(req: NextRequest) {
         originZip,
         destZip,
         homeSize,
+        requestId: lead.id,
       },
       settings.adminEmail,
     ).catch((err) => console.error('[emailService] Failed to send lead emails:', err));

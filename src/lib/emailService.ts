@@ -12,6 +12,7 @@ export interface LeadEmailData {
   destZip?: string;
   homeSize?: string;
   companyName?: string;
+  requestId?: string;
 }
 
 function formatCurrency(value: string | undefined): string {
@@ -37,6 +38,7 @@ function substituteVariables(template: string, data: Record<string, string>): st
 }
 
 function buildVariableMap(lead: LeadEmailData): Record<string, string> {
+  const baseUrl = process.env.NEXTAUTH_URL ?? process.env.NEXT_PUBLIC_BASE_URL ?? '';
   return {
     name: lead.name,
     email: lead.email,
@@ -48,6 +50,8 @@ function buildVariableMap(lead: LeadEmailData): Record<string, string> {
     dest_zip: lead.destZip ?? 'N/A',
     home_size: lead.homeSize ?? 'N/A',
     company_name: lead.companyName ?? 'GetMoveCost.com',
+    request_id: lead.requestId ?? 'N/A',
+    dashboard_link: `${baseUrl}/backoffice/leads`,
   };
 }
 

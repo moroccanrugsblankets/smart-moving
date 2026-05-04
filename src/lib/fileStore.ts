@@ -772,7 +772,7 @@ const defaultEmailTemplates: Array<{ id: string; key: string; name: string; subj
   <li>Destination ZIP: {{dest_zip}}</li>
   <li>Home Size: {{home_size}}</li>
 </ul>`,
-    variables: ['{{name}}', '{{email}}', '{{phone}}', '{{service}}', '{{estimate}}', '{{service_date}}', '{{origin_zip}}', '{{dest_zip}}', '{{home_size}}'],
+    variables: ['{{name}}', '{{email}}', '{{phone}}', '{{service}}', '{{estimate}}', '{{service_date}}', '{{origin_zip}}', '{{dest_zip}}', '{{home_size}}', '{{dashboard_link}}'],
   },
   {
     id: 'tpl-receipt-acknowledgement',
@@ -791,7 +791,7 @@ const defaultEmailTemplates: Array<{ id: string; key: string; name: string; subj
   <li>Home Size: {{home_size}}</li>
 </ul>
 <p>Best regards,<br>{{company_name}}</p>`,
-    variables: ['{{name}}', '{{email}}', '{{phone}}', '{{service}}', '{{estimate}}', '{{service_date}}', '{{origin_zip}}', '{{dest_zip}}', '{{home_size}}', '{{company_name}}'],
+    variables: ['{{name}}', '{{email}}', '{{phone}}', '{{service}}', '{{estimate}}', '{{service_date}}', '{{origin_zip}}', '{{dest_zip}}', '{{home_size}}', '{{company_name}}', '{{request_id}}'],
   },
 ];
 

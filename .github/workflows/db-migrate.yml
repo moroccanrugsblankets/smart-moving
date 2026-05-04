@@ -46,11 +46,7 @@ jobs:
       # Seed is optional and should only be used for first-time DB bootstrap
       - name: Seed initial admin (optional)
         if: ${{ github.event.inputs.seed == 'true' }}
-        run: |
-          # Ensure generated client exists (fixes ERR_MODULE_NOT_FOUND)
-          npm run db:generate
-          ls -la src/generated/prisma || true
-          npm run db:seed
+        run: npm run db:seed
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           INITIAL_ADMIN_PASSWORD: ${{ secrets.INITIAL_ADMIN_PASSWORD }}

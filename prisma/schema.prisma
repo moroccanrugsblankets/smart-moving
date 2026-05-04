@@ -90,23 +90,25 @@ model BlogCategory {
 }
 
 model BlogPost {
-  id        String     @id @default(uuid())
-  title     String
-  slug      String     @unique
-  content   String     @default("")
-  excerpt   String     @default("")
-  category  String     @default("")
-  tags      String[]
-  status    PostStatus @default(DRAFT)
-  metaTitle String     @default("")
-  metaDesc  String     @default("")
-  canonical String     @default("")
-  ogTitle   String     @default("")
-  ogDesc    String     @default("")
-  ogImage   String     @default("")
-  authorId  String
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+  id             String     @id @default(uuid())
+  title          String
+  slug           String     @unique
+  content        String     @default("")
+  excerpt        String     @default("")
+  category       String     @default("")
+  categoryIds    String[]   @default([])
+  featuredImage  String     @default("")
+  tags           String[]
+  status         PostStatus @default(DRAFT)
+  metaTitle      String     @default("")
+  metaDesc       String     @default("")
+  canonical      String     @default("")
+  ogTitle        String     @default("")
+  ogDesc         String     @default("")
+  ogImage        String     @default("")
+  authorId       String
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
 }
 
 model EmailLog {
@@ -140,4 +142,15 @@ model Page {
   ogDesc    String   @default("")
   ogImage   String   @default("")
   updatedAt DateTime @updatedAt
+}
+
+model EmailTemplate {
+  id             String   @id @default(uuid())
+  key            String   @unique
+  name           String
+  subject        String
+  htmlContent    String   @default("")
+  defaultContent String   @default("")
+  variables      String[]
+  updatedAt      DateTime @updatedAt
 }

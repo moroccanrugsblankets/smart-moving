@@ -44,7 +44,7 @@ export default function UsersPage() {
         const res = await fetch(`/api/backoffice/users/${editUser.id}`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name: form.name, role: form.role, ...(form.password ? { password: form.password } : {}) }),
+          body: JSON.stringify({ name: form.name, email: form.email, role: form.role, ...(form.password ? { password: form.password } : {}) }),
         });
         if (res.ok) { addToast('User updated'); await loadUsers(); closeModal(); }
         else { const e = await res.json(); addToast(e.error ?? 'Failed to update', 'error'); }
@@ -154,6 +154,13 @@ export default function UsersPage() {
                   className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
               </div>
               {!editUser && (
+                <div>
+                  <label className="block text-slate-400 text-sm mb-1">Email</label>
+                  <input type="email" value={form.email} onChange={e => setForm(p => ({ ...p, email: e.target.value }))}
+                    className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                </div>
+              )}
+              {editUser && (
                 <div>
                   <label className="block text-slate-400 text-sm mb-1">Email</label>
                   <input type="email" value={form.email} onChange={e => setForm(p => ({ ...p, email: e.target.value }))}

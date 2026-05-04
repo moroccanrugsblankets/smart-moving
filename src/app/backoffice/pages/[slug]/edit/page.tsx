@@ -3,6 +3,7 @@
 import { useState, useEffect, FormEvent } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Toast, useToast } from '@/components/Toast';
+import RichTextEditor from '@/components/RichTextEditor';
 
 interface PageContent {
   slug: string;
@@ -62,6 +63,15 @@ export default function EditPagePage() {
       <div className="flex items-center gap-3">
         <button onClick={() => router.push('/backoffice/pages')} className="text-slate-400 hover:text-white">←</button>
         <h1 className="text-2xl font-bold text-white">Edit: {form.title || slug}</h1>
+        <a
+          href={`/${slug}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="ml-auto px-3 py-1 bg-slate-600 hover:bg-slate-500 text-white text-xs rounded"
+          title="View page"
+        >
+          👁 View Page
+        </a>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -74,8 +84,7 @@ export default function EditPagePage() {
           </div>
           <div>
             <label className="block text-slate-400 text-sm mb-1">Content</label>
-            <textarea rows={16} value={form.content} onChange={e => set('content', e.target.value)}
-              className="w-full px-3 py-2 bg-slate-600 border border-slate-500 rounded text-white text-sm font-mono focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <RichTextEditor value={form.content} onChange={v => set('content', v)} minHeight={320} />
           </div>
         </div>
 
@@ -113,3 +122,4 @@ export default function EditPagePage() {
     </div>
   );
 }
+

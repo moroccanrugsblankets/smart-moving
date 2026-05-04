@@ -17,10 +17,15 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     return NextResponse.json({ error: 'Invalid role' }, { status: 400 });
   }
 
-  const updates: { name?: string; role?: 'admin' | 'manager'; passwordHash?: string } = {};
+  const updates: { name?: string; email?: string; role?: 'admin' | 'manager'; passwordHash?: string } = {};
   if (body.name) updates.name = body.name;
   if (body.role) updates.role = body.role;
   if (body.password) updates.passwordHash = await bcrypt.hash(body.password, 10);
+  if (body.email && body.email !== existing.email) {
+    const conflict = await usersStore.findByEmail(body.email);
+    if (conflict) return NextResponse.json({ error: 'Email already in use by another account' }, { status: 409 });
+    updates.email = body.email;
+  }
 
   const updated = await usersStore.update(id, updates);
   logActivity(auth.session.user.id, auth.session.user.email, 'UPDATE', 'users', `Updated user: ${updated.email}`);

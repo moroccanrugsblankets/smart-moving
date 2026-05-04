@@ -59,12 +59,23 @@ export default function PagesPage() {
                   <td className="px-4 py-3">{page.title}</td>
                   <td className="px-4 py-3 text-slate-400">{page.updatedAt ? formatDate(page.updatedAt) : '—'}</td>
                   <td className="px-4 py-3">
-                    <Link
-                      href={`/backoffice/pages/${page.slug}/edit`}
-                      className="px-3 py-1 bg-slate-600 hover:bg-slate-500 text-white text-xs rounded"
-                    >
-                      Edit
-                    </Link>
+                    <div className="flex gap-2">
+                      <Link
+                        href={`/backoffice/pages/${page.slug}/edit`}
+                        className="px-3 py-1 bg-slate-600 hover:bg-slate-500 text-white text-xs rounded"
+                      >
+                        Edit
+                      </Link>
+                      <Link
+                        href={`/${page.slug}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-3 py-1 bg-slate-600 hover:bg-slate-500 text-white text-xs rounded"
+                        title="View page"
+                      >
+                        👁 View
+                      </Link>
+                    </div>
                   </td>
                 </tr>
               ))}

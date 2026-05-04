@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { addLead, getLeads } from '@/lib/leadsStore';
-import { leadsFileStore } from '@/lib/fileStore';
+import { leadsFileStore, settingsStore } from '@/lib/fileStore';
+import { sendLeadEmails } from '@/lib/emailService';
 
 export async function POST(req: NextRequest) {
   try {
@@ -26,6 +27,22 @@ export async function POST(req: NextRequest) {
       firstName, lastName, email, phone, serviceDate,
       serviceType, originZip, destZip, homeSize, estimate,
     });
+
+    const settings = await settingsStore.get();
+    sendLeadEmails(
+      {
+        name: `${firstName} ${lastName}`,
+        email,
+        phone,
+        service: serviceType ?? '',
+        estimate,
+        serviceDate,
+        originZip,
+        destZip,
+        homeSize,
+      },
+      settings.adminEmail,
+    ).catch(() => {});
 
     return NextResponse.json({ success: true, leadId: lead.id });
   } catch {

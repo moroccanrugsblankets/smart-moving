@@ -741,14 +741,18 @@ const defaultEmailTemplates: Array<{ id: string; key: string; name: string; subj
     subject: 'Your moving estimate request – {{service}}',
     defaultContent: `<p>Hi {{name}},</p>
 <p>Thank you for requesting a moving estimate. We have received your inquiry and will be in touch shortly.</p>
-<p><strong>Details:</strong></p>
+<p><strong>Your Request Details:</strong></p>
 <ul>
   <li>Service: {{service}}</li>
-  <li>Estimate: {{estimate}}</li>
   <li>Service Date: {{service_date}}</li>
+  <li>Estimated Cost: {{estimate}}</li>
+  <li>Origin ZIP: {{origin_zip}}</li>
+  <li>Destination ZIP: {{dest_zip}}</li>
+  <li>Home Size: {{home_size}}</li>
+  <li>Phone: {{phone}}</li>
 </ul>
 <p>Best regards,<br>{{company_name}}</p>`,
-    variables: ['{{name}}', '{{service}}', '{{estimate}}', '{{service_date}}', '{{company_name}}'],
+    variables: ['{{name}}', '{{email}}', '{{phone}}', '{{service}}', '{{estimate}}', '{{service_date}}', '{{origin_zip}}', '{{dest_zip}}', '{{home_size}}', '{{company_name}}'],
   },
   {
     id: 'tpl-admin-notification',
@@ -762,10 +766,13 @@ const defaultEmailTemplates: Array<{ id: string; key: string; name: string; subj
   <li>Email: {{email}}</li>
   <li>Phone: {{phone}}</li>
   <li>Service: {{service}}</li>
-  <li>Estimate: {{estimate}}</li>
+  <li>Estimated Cost: {{estimate}}</li>
   <li>Service Date: {{service_date}}</li>
+  <li>Origin ZIP: {{origin_zip}}</li>
+  <li>Destination ZIP: {{dest_zip}}</li>
+  <li>Home Size: {{home_size}}</li>
 </ul>`,
-    variables: ['{{name}}', '{{email}}', '{{phone}}', '{{service}}', '{{estimate}}', '{{service_date}}'],
+    variables: ['{{name}}', '{{email}}', '{{phone}}', '{{service}}', '{{estimate}}', '{{service_date}}', '{{origin_zip}}', '{{dest_zip}}', '{{home_size}}'],
   },
   {
     id: 'tpl-receipt-acknowledgement',
@@ -773,9 +780,18 @@ const defaultEmailTemplates: Array<{ id: string; key: string; name: string; subj
     name: 'Receipt / Acknowledgement',
     subject: 'We received your request – {{company_name}}',
     defaultContent: `<p>Hi {{name}},</p>
-<p>This is a confirmation that we have received your request. Our team will review it and contact you within 24 hours.</p>
+<p>This is a confirmation that we have received your moving estimate request. Our team will review it and contact you within 24 hours.</p>
+<p><strong>Summary:</strong></p>
+<ul>
+  <li>Service: {{service}}</li>
+  <li>Service Date: {{service_date}}</li>
+  <li>Estimated Cost: {{estimate}}</li>
+  <li>Origin ZIP: {{origin_zip}}</li>
+  <li>Destination ZIP: {{dest_zip}}</li>
+  <li>Home Size: {{home_size}}</li>
+</ul>
 <p>Best regards,<br>{{company_name}}</p>`,
-    variables: ['{{name}}', '{{company_name}}'],
+    variables: ['{{name}}', '{{email}}', '{{phone}}', '{{service}}', '{{estimate}}', '{{service_date}}', '{{origin_zip}}', '{{dest_zip}}', '{{home_size}}', '{{company_name}}'],
   },
 ];
 
@@ -794,27 +810,27 @@ function mapEmailTemplate(t: { id: string; key: string; name: string; subject: s
 
 export const emailTemplatesStore = {
   getAll: async (): Promise<EmailTemplate[]> => {
-    // Seed defaults on first call
-    const count = await prisma.emailTemplate.count();
-    if (count === 0) {
-      await Promise.all(
-        defaultEmailTemplates.map(tpl =>
-          prisma.emailTemplate.upsert({
-            where: { key: tpl.key },
-            update: {},
-            create: {
-              id: tpl.id,
-              key: tpl.key,
-              name: tpl.name,
-              subject: tpl.subject,
-              htmlContent: tpl.defaultContent,
-              defaultContent: tpl.defaultContent,
-              variables: tpl.variables,
-            },
-          })
-        )
-      );
-    }
+    // Upsert defaults — always sync variables and defaultContent from code definitions
+    await Promise.all(
+      defaultEmailTemplates.map(tpl =>
+        prisma.emailTemplate.upsert({
+          where: { key: tpl.key },
+          update: {
+            variables: tpl.variables,
+            defaultContent: tpl.defaultContent,
+          },
+          create: {
+            id: tpl.id,
+            key: tpl.key,
+            name: tpl.name,
+            subject: tpl.subject,
+            htmlContent: tpl.defaultContent,
+            defaultContent: tpl.defaultContent,
+            variables: tpl.variables,
+          },
+        })
+      )
+    );
     const rows = await prisma.emailTemplate.findMany({ orderBy: { name: 'asc' } });
     return rows.map(mapEmailTemplate);
   },

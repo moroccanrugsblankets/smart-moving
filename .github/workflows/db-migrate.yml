@@ -1,7 +1,55 @@
+on:
+  workflow_dispatch:
+    inputs:
+      seed:
+        description: "Run seed after migrations (ONLY for first-time setup)"
+        required: true
+        default: "false"
+        type: choice
+        options:
+          - "false"
+          - "true"
+
+env:
+  # Opt into Node 24 runtime for JavaScript-based GitHub Actions (checkout/setup-node)
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Always generate Prisma client before migrate/seed
+      - name: Prisma generate
+        run: npm run db:generate
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
+      - name: Run database migrations (prisma migrate deploy)
+        run: npm run db:migrate
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
+      # Seed is optional and should only be used for first-time DB bootstrap
       - name: Seed initial admin (optional)
         if: ${{ github.event.inputs.seed == 'true' }}
         run: |
+          # Ensure generated client exists (fixes ERR_MODULE_NOT_FOUND)
           npm run db:generate
+          ls -la src/generated/prisma || true
           npm run db:seed
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}

@@ -157,7 +157,7 @@ export default function LeadsPage() {
                     <td className="px-4 py-3">{lead.estimate ?? '—'}</td>
                     <td className="px-4 py-3">{lead.serviceDate}</td>
                     <td className="px-4 py-3 text-slate-400">{formatDate(lead.createdAt)}</td>
-                     <td className="px-4 py-3">
+                    <td className="px-4 py-3">
                       <div className="flex gap-2">
                         <button
                           onClick={() => setViewLead(lead)}
@@ -172,7 +172,7 @@ export default function LeadsPage() {
                           Delete
                         </button>
                       </div>
-                     </td>
+                    </td>
                   </tr>
                 ))}
               </tbody>

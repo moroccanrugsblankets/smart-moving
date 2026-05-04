@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 interface EstimateResult {
   low: number;
@@ -48,6 +48,11 @@ export default function Calculator() {
     homeSize: '2br', squareFeet: '1500', distanceMiles: '50',
     hasStairs: false, hasPacking: false, hasPiano: false, hasLongCarry: false,
   });
+  const [distanceReadOnly, setDistanceReadOnly] = useState(true);
+  const [distanceLoading, setDistanceLoading]   = useState(false);
+  const [distanceError, setDistanceError]       = useState('');
+  const distanceAbort = useRef<AbortController | null>(null);
+
   const [estimate, setEstimate]   = useState<EstimateResult | null>(null);
   const [loading, setLoading]     = useState(false);
   const [leadForm, setLeadForm]   = useState({
@@ -55,6 +60,53 @@ export default function Calculator() {
   });
   const [submitted, setSubmitted] = useState(false);
   const [leadError, setLeadError] = useState('');
+
+  useEffect(() => {
+    if (serviceType !== 'moving') return;
+    const { originZip, destZip } = form;
+    if (!/^\d{5}$/.test(originZip) || !/^\d{5}$/.test(destZip)) return;
+
+    // Cancel any previous in-flight request
+    distanceAbort.current?.abort();
+    const ctrl = new AbortController();
+    distanceAbort.current = ctrl;
+
+    setDistanceLoading(true);
+    setDistanceError('');
+
+    fetch('/api/zip-distance', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ originZip, destZip }),
+      signal: ctrl.signal,
+    })
+      .then(r => {
+        if (!r.ok) throw new Error('api_error');
+        return r.json();
+      })
+      .then(data => {
+        if (data.success) {
+          setForm(f => ({ ...f, distanceMiles: String(data.distance) }));
+          setDistanceReadOnly(true);
+          setDistanceError('');
+        } else {
+          setDistanceReadOnly(false);
+          setDistanceError(
+            'Distance could not be calculated automatically, please enter it manually.',
+          );
+        }
+      })
+      .catch(err => {
+        if (err.name !== 'AbortError') {
+          setDistanceReadOnly(false);
+          setDistanceError(
+            'Distance could not be calculated automatically, please enter it manually.',
+          );
+        }
+      })
+      .finally(() => setDistanceLoading(false));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form.originZip, form.destZip, serviceType]);
 
   async function handleCalculate() {
     setLoading(true);
@@ -228,11 +280,44 @@ export default function Calculator() {
                   <label className="block text-sm font-semibold text-slate-700 mb-1.5">
                     Estimated Distance (miles)
                   </label>
-                  <input
-                    type="number" min={1} value={form.distanceMiles}
-                    onChange={e => setForm(f => ({ ...f, distanceMiles: e.target.value }))}
-                    className={inputClass}
-                  />
+                  <div className="relative flex items-center gap-2">
+                    <div className="relative flex-1">
+                      <input
+                        type="number" min={1} value={form.distanceMiles}
+                        readOnly={distanceReadOnly}
+                        onChange={e => setForm(f => ({ ...f, distanceMiles: e.target.value }))}
+                        className={`${inputClass} pr-10 ${
+                          distanceLoading
+                            ? 'bg-blue-50 border-blue-300 text-blue-400'
+                            : distanceReadOnly
+                              ? 'bg-slate-100 text-slate-600 cursor-default'
+                              : ''
+                        }`}
+                      />
+                      {distanceLoading && (
+                        <span className="absolute right-3 top-1/2 -translate-y-1/2">
+                          <svg className="animate-spin w-4 h-4 text-blue-500" width={16} height={16} fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                          </svg>
+                        </span>
+                      )}
+                    </div>
+                    {distanceReadOnly && !distanceLoading && (
+                      <button
+                        type="button"
+                        onClick={() => setDistanceReadOnly(false)}
+                        className="flex-shrink-0 text-xs font-semibold text-blue-600 border border-blue-300 bg-blue-50 hover:bg-blue-100 px-3 h-12 rounded-xl transition-all"
+                      >
+                        Edit
+                      </button>
+                    )}
+                  </div>
+                  {distanceError && (
+                    <p className="mt-1.5 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+                      {distanceError}
+                    </p>
+                  )}
                 </div>
               </>
             )}

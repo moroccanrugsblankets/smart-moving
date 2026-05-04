@@ -1,8 +1,10 @@
 'use client';
 
-import { useState, FormEvent } from 'react';
+import { useState, useEffect, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { Toast, useToast } from '@/components/Toast';
+import RichTextEditor from '@/components/RichTextEditor';
+import ImageUploadField from '@/components/ImageUploadField';
 
 interface BlogPost {
   id?: string;
@@ -11,6 +13,8 @@ interface BlogPost {
   content: string;
   excerpt: string;
   category: string;
+  categoryIds: string[];
+  featuredImage: string;
   tags: string[];
   status: 'draft' | 'published';
   metaTitle: string;
@@ -19,6 +23,12 @@ interface BlogPost {
   ogTitle: string;
   ogDesc: string;
   ogImage: string;
+}
+
+interface BlogCategory {
+  id: string;
+  name: string;
+  slug: string;
 }
 
 interface BlogFormProps {
@@ -34,13 +44,22 @@ export default function BlogForm({ initialData, postId }: BlogFormProps) {
   const router = useRouter();
   const { toasts, addToast, removeToast } = useToast();
   const [saving, setSaving] = useState(false);
+  const [categories, setCategories] = useState<BlogCategory[]>([]);
   const [form, setForm] = useState<BlogPost>({
     title: '', slug: '', content: '', excerpt: '', category: '',
+    categoryIds: [], featuredImage: '',
     tags: [], status: 'draft',
     metaTitle: '', metaDesc: '', canonical: '', ogTitle: '', ogDesc: '', ogImage: '',
     ...initialData,
   });
   const [tagsStr, setTagsStr] = useState(initialData?.tags?.join(', ') ?? '');
+
+  useEffect(() => {
+    fetch('/api/backoffice/blog/categories')
+      .then(r => r.ok ? r.json() : [])
+      .then(setCategories)
+      .catch(() => {});
+  }, []);
 
   function set<K extends keyof BlogPost>(key: K, value: BlogPost[K]) {
     setForm(prev => {
@@ -49,6 +68,15 @@ export default function BlogForm({ initialData, postId }: BlogFormProps) {
         next.slug = slugify(value as string);
       }
       return next;
+    });
+  }
+
+  function toggleCategory(id: string) {
+    setForm(prev => {
+      const ids = prev.categoryIds.includes(id)
+        ? prev.categoryIds.filter(c => c !== id)
+        : [...prev.categoryIds, id];
+      return { ...prev, categoryIds: ids };
     });
   }
 
@@ -103,29 +131,55 @@ export default function BlogForm({ initialData, postId }: BlogFormProps) {
         </div>
         <div>
           <label className="block text-slate-400 text-sm mb-1">Content *</label>
-          <textarea rows={12} required value={form.content} onChange={e => set('content', e.target.value)}
-            className="w-full px-3 py-2 bg-slate-600 border border-slate-500 rounded text-white text-sm font-mono focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          <RichTextEditor value={form.content} onChange={v => set('content', v)} minHeight={320} />
         </div>
+
+        <ImageUploadField
+          label="Featured Image"
+          value={form.featuredImage}
+          onChange={url => set('featuredImage', url)}
+        />
+
         <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-slate-400 text-sm mb-1">Category</label>
-            <input type="text" value={form.category} onChange={e => set('category', e.target.value)}
-              className="w-full px-3 py-2 bg-slate-600 border border-slate-500 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
-          </div>
           <div>
             <label className="block text-slate-400 text-sm mb-1">Tags (comma-separated)</label>
             <input type="text" value={tagsStr} onChange={e => setTagsStr(e.target.value)}
               className="w-full px-3 py-2 bg-slate-600 border border-slate-500 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
           </div>
+          <div>
+            <label className="block text-slate-400 text-sm mb-1">Status</label>
+            <select value={form.status} onChange={e => set('status', e.target.value as 'draft' | 'published')}
+              className="w-full px-3 py-2 bg-slate-600 border border-slate-500 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="draft">Draft</option>
+              <option value="published">Published</option>
+            </select>
+          </div>
         </div>
-        <div>
-          <label className="block text-slate-400 text-sm mb-1">Status</label>
-          <select value={form.status} onChange={e => set('status', e.target.value as 'draft' | 'published')}
-            className="px-3 py-2 bg-slate-600 border border-slate-500 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <option value="draft">Draft</option>
-            <option value="published">Published</option>
-          </select>
-        </div>
+
+        {categories.length > 0 && (
+          <div>
+            <label className="block text-slate-400 text-sm mb-2">Categories</label>
+            <div className="flex flex-wrap gap-2">
+              {categories.map(cat => {
+                const selected = form.categoryIds.includes(cat.id);
+                return (
+                  <button
+                    key={cat.id}
+                    type="button"
+                    onClick={() => toggleCategory(cat.id)}
+                    className={`px-3 py-1 rounded text-xs border transition-colors ${
+                      selected
+                        ? 'bg-blue-600 border-blue-500 text-white'
+                        : 'bg-slate-600 border-slate-500 text-slate-300 hover:border-blue-400'
+                    }`}
+                  >
+                    {cat.name}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="bg-slate-700 rounded-lg p-6 space-y-4">
@@ -161,3 +215,4 @@ export default function BlogForm({ initialData, postId }: BlogFormProps) {
     </form>
   );
 }
+

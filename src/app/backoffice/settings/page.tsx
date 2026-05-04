@@ -2,6 +2,7 @@
 
 import { useState, useEffect, FormEvent } from 'react';
 import { Toast, useToast } from '@/components/Toast';
+import ImageUploadField from '@/components/ImageUploadField';
 
 interface Settings {
   companyName: string;
@@ -85,22 +86,22 @@ export default function SettingsPage() {
 
         <div className="bg-slate-700 rounded-lg p-6 space-y-4">
           <h2 className="text-white font-semibold">Branding</h2>
-          {[
-            { label: 'Logo URL (Header)', key: 'logoUrlHeader' as const },
-            { label: 'Logo URL (Footer)', key: 'logoUrlFooter' as const },
-            { label: 'Favicon URL', key: 'faviconUrl' as const },
-          ].map(f => (
-            <div key={f.key}>
-              <label className="block text-slate-400 text-sm mb-1">{f.label}</label>
-              <input
-                type="url"
-                value={settings[f.key] as string}
-                onChange={e => set(f.key, e.target.value)}
-                placeholder="https://"
-                className="w-full px-3 py-2 bg-slate-600 border border-slate-500 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-          ))}
+          <ImageUploadField
+            label="Logo (Header)"
+            value={settings.logoUrlHeader}
+            onChange={url => set('logoUrlHeader', url)}
+          />
+          <ImageUploadField
+            label="Logo (Footer)"
+            value={settings.logoUrlFooter}
+            onChange={url => set('logoUrlFooter', url)}
+          />
+          <ImageUploadField
+            label="Favicon"
+            value={settings.faviconUrl}
+            onChange={url => set('faviconUrl', url)}
+            accept="image/x-icon,image/png,image/svg+xml"
+          />
         </div>
 
         <div className="bg-slate-700 rounded-lg p-6 space-y-4">
@@ -132,3 +133,4 @@ export default function SettingsPage() {
     </div>
   );
 }
+

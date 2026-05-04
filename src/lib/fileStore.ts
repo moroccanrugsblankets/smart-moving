@@ -38,6 +38,8 @@ export interface BlogPost {
   content: string;
   excerpt: string;
   category: string;
+  categoryIds: string[];
+  featuredImage: string;
   tags: string[];
   status: 'draft' | 'published';
   metaTitle: string;
@@ -55,6 +57,17 @@ export interface BlogCategory {
   id: string;
   name: string;
   slug: string;
+}
+
+export interface EmailTemplate {
+  id: string;
+  key: string;
+  name: string;
+  subject: string;
+  htmlContent: string;
+  defaultContent: string;
+  variables: string[];
+  updatedAt: string;
 }
 
 export interface EmailConfig {
@@ -235,11 +248,12 @@ export const usersStore = {
       createdAt: u.createdAt.toISOString(),
     };
   },
-  update: async (id: string, data: Partial<Pick<AdminUser, 'name' | 'role' | 'passwordHash'>>): Promise<AdminUser> => {
+  update: async (id: string, data: Partial<Pick<AdminUser, 'name' | 'email' | 'role' | 'passwordHash'>>): Promise<AdminUser> => {
     const u = await prisma.user.update({
       where: { id },
       data: {
         ...(data.name !== undefined && { name: data.name }),
+        ...(data.email !== undefined && { email: data.email }),
         ...(data.role !== undefined && { role: toDbRole(data.role) }),
         ...(data.passwordHash !== undefined && { passwordHash: data.passwordHash }),
       },
@@ -308,6 +322,8 @@ export const blogStore = {
       content: p.content,
       excerpt: p.excerpt,
       category: p.category,
+      categoryIds: p.categoryIds,
+      featuredImage: p.featuredImage,
       tags: p.tags,
       status: mapPostStatus(p.status),
       metaTitle: p.metaTitle,
@@ -331,6 +347,8 @@ export const blogStore = {
       content: p.content,
       excerpt: p.excerpt,
       category: p.category,
+      categoryIds: p.categoryIds,
+      featuredImage: p.featuredImage,
       tags: p.tags,
       status: mapPostStatus(p.status),
       metaTitle: p.metaTitle,
@@ -353,6 +371,8 @@ export const blogStore = {
         content: data.content ?? '',
         excerpt: data.excerpt ?? '',
         category: data.category ?? '',
+        categoryIds: data.categoryIds ?? [],
+        featuredImage: data.featuredImage ?? '',
         tags: data.tags ?? [],
         status: toDbPostStatus(data.status),
         metaTitle: data.metaTitle ?? '',
@@ -371,6 +391,8 @@ export const blogStore = {
       content: p.content,
       excerpt: p.excerpt,
       category: p.category,
+      categoryIds: p.categoryIds,
+      featuredImage: p.featuredImage,
       tags: p.tags,
       status: mapPostStatus(p.status),
       metaTitle: p.metaTitle,
@@ -393,6 +415,8 @@ export const blogStore = {
         ...(data.content !== undefined && { content: data.content }),
         ...(data.excerpt !== undefined && { excerpt: data.excerpt }),
         ...(data.category !== undefined && { category: data.category }),
+        ...(data.categoryIds !== undefined && { categoryIds: data.categoryIds }),
+        ...(data.featuredImage !== undefined && { featuredImage: data.featuredImage }),
         ...(data.tags !== undefined && { tags: data.tags }),
         ...(data.status !== undefined && { status: toDbPostStatus(data.status) }),
         ...(data.metaTitle !== undefined && { metaTitle: data.metaTitle }),
@@ -411,6 +435,8 @@ export const blogStore = {
       content: p.content,
       excerpt: p.excerpt,
       category: p.category,
+      categoryIds: p.categoryIds,
+      featuredImage: p.featuredImage,
       tags: p.tags,
       status: mapPostStatus(p.status),
       metaTitle: p.metaTitle,
@@ -705,3 +731,115 @@ export const marketRatesStore = {
   },
 };
 
+// ─── Default email templates ──────────────────────────────────────────────────
+
+const defaultEmailTemplates: Array<{ id: string; key: string; name: string; subject: string; defaultContent: string; variables: string[] }> = [
+  {
+    id: 'tpl-lead-confirmation',
+    key: 'lead_confirmation',
+    name: 'Lead Confirmation',
+    subject: 'Your moving estimate request – {{service}}',
+    defaultContent: `<p>Hi {{name}},</p>
+<p>Thank you for requesting a moving estimate. We have received your inquiry and will be in touch shortly.</p>
+<p><strong>Details:</strong></p>
+<ul>
+  <li>Service: {{service}}</li>
+  <li>Estimate: {{estimate}}</li>
+  <li>Service Date: {{service_date}}</li>
+</ul>
+<p>Best regards,<br>{{company_name}}</p>`,
+    variables: ['{{name}}', '{{service}}', '{{estimate}}', '{{service_date}}', '{{company_name}}'],
+  },
+  {
+    id: 'tpl-admin-notification',
+    key: 'admin_notification',
+    name: 'Admin Notification (New Lead)',
+    subject: 'New lead received – {{name}}',
+    defaultContent: `<p>A new lead has been submitted.</p>
+<p><strong>Lead Details:</strong></p>
+<ul>
+  <li>Name: {{name}}</li>
+  <li>Email: {{email}}</li>
+  <li>Phone: {{phone}}</li>
+  <li>Service: {{service}}</li>
+  <li>Estimate: {{estimate}}</li>
+  <li>Service Date: {{service_date}}</li>
+</ul>`,
+    variables: ['{{name}}', '{{email}}', '{{phone}}', '{{service}}', '{{estimate}}', '{{service_date}}'],
+  },
+  {
+    id: 'tpl-receipt-acknowledgement',
+    key: 'receipt_acknowledgement',
+    name: 'Receipt / Acknowledgement',
+    subject: 'We received your request – {{company_name}}',
+    defaultContent: `<p>Hi {{name}},</p>
+<p>This is a confirmation that we have received your request. Our team will review it and contact you within 24 hours.</p>
+<p>Best regards,<br>{{company_name}}</p>`,
+    variables: ['{{name}}', '{{company_name}}'],
+  },
+];
+
+function mapEmailTemplate(t: { id: string; key: string; name: string; subject: string; htmlContent: string; defaultContent: string; variables: string[]; updatedAt: Date }): EmailTemplate {
+  return {
+    id: t.id,
+    key: t.key,
+    name: t.name,
+    subject: t.subject,
+    htmlContent: t.htmlContent || t.defaultContent,
+    defaultContent: t.defaultContent,
+    variables: t.variables,
+    updatedAt: t.updatedAt.toISOString(),
+  };
+}
+
+export const emailTemplatesStore = {
+  getAll: async (): Promise<EmailTemplate[]> => {
+    // Seed defaults on first call
+    const count = await prisma.emailTemplate.count();
+    if (count === 0) {
+      await Promise.all(
+        defaultEmailTemplates.map(tpl =>
+          prisma.emailTemplate.upsert({
+            where: { key: tpl.key },
+            update: {},
+            create: {
+              id: tpl.id,
+              key: tpl.key,
+              name: tpl.name,
+              subject: tpl.subject,
+              htmlContent: tpl.defaultContent,
+              defaultContent: tpl.defaultContent,
+              variables: tpl.variables,
+            },
+          })
+        )
+      );
+    }
+    const rows = await prisma.emailTemplate.findMany({ orderBy: { name: 'asc' } });
+    return rows.map(mapEmailTemplate);
+  },
+  findById: async (id: string): Promise<EmailTemplate | undefined> => {
+    const t = await prisma.emailTemplate.findUnique({ where: { id } });
+    if (!t) return undefined;
+    return mapEmailTemplate(t);
+  },
+  update: async (id: string, data: { subject?: string; htmlContent?: string }): Promise<EmailTemplate> => {
+    const t = await prisma.emailTemplate.update({
+      where: { id },
+      data: {
+        ...(data.subject !== undefined && { subject: data.subject }),
+        ...(data.htmlContent !== undefined && { htmlContent: data.htmlContent }),
+      },
+    });
+    return mapEmailTemplate(t);
+  },
+  restoreDefault: async (id: string): Promise<EmailTemplate> => {
+    const existing = await prisma.emailTemplate.findUnique({ where: { id } });
+    if (!existing) throw new Error('Template not found');
+    const t = await prisma.emailTemplate.update({
+      where: { id },
+      data: { htmlContent: existing.defaultContent },
+    });
+    return mapEmailTemplate(t);
+  },
+};

@@ -8,10 +8,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   if (auth instanceof NextResponse) return auth;
   const { id } = await params;
 
-  const log = emailLogsStore.findById(id);
+  const log = await emailLogsStore.findById(id);
   if (!log) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
-  const config = emailConfigStore.get();
+  const config = await emailConfigStore.get();
   if (!config.host || !config.username) {
     return NextResponse.json({ error: 'SMTP not configured' }, { status: 400 });
   }
@@ -31,7 +31,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       html: log.content,
     });
 
-    emailLogsStore.add({
+    await emailLogsStore.add({
       id: crypto.randomUUID(),
       to: log.to,
       subject: `[Resent] ${log.subject}`,

@@ -3,8 +3,8 @@ import { marketRatesStore } from './fileStore';
 
 type MarketRates = typeof staticMarketRates;
 
-function getMarketRates(): MarketRates {
-  const dynamic = marketRatesStore.get();
+async function getMarketRates(): Promise<MarketRates> {
+  const dynamic = await marketRatesStore.get();
   if (dynamic) return dynamic as unknown as MarketRates;
   return staticMarketRates;
 }
@@ -32,18 +32,17 @@ export interface EstimateResult {
   breakdown: Record<string, number>;
 }
 
-function getMultiplier(stateCode: string): number {
-  const marketRates = getMarketRates();
+function getMultiplier(marketRates: MarketRates, stateCode: string): number {
   const states = marketRates.stateMultipliers as Record<string, { multiplier: number }>;
   return states[stateCode.toUpperCase()]?.multiplier ?? 1.0;
 }
 
-export function calculateMoving(input: MovingInput): EstimateResult {
-  const marketRates = getMarketRates();
+export async function calculateMoving(input: MovingInput): Promise<EstimateResult> {
+  const marketRates = await getMarketRates();
   const { baseRates, volumeConstants, complexityFactors } = marketRates;
   const vol = volumeConstants[input.homeSize as keyof typeof volumeConstants];
   const stateMultiplier =
-    (getMultiplier(input.originState) + getMultiplier(input.destState)) / 2;
+    (getMultiplier(marketRates, input.originState) + getMultiplier(marketRates, input.destState)) / 2;
 
   let complexityAdder = 0;
   if (input.hasStairs)    complexityAdder += complexityFactors.stairs;
@@ -72,10 +71,10 @@ export function calculateMoving(input: MovingInput): EstimateResult {
   };
 }
 
-export function calculateCleaning(input: CleaningInput): EstimateResult {
-  const marketRates = getMarketRates();
+export async function calculateCleaning(input: CleaningInput): Promise<EstimateResult> {
+  const marketRates = await getMarketRates();
   const { baseRates } = marketRates;
-  const stateMultiplier = getMultiplier(input.state);
+  const stateMultiplier = getMultiplier(marketRates, input.state);
   const base =
     input.squareFeet * baseRates.cleaning.perSqFt * stateMultiplier +
     baseRates.cleaning.fixedServiceFee;

@@ -1,0 +1,143 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Enums ───────────────────────────────────────────────────────────────────
+
+enum Role {
+  ADMIN
+  MANAGER
+}
+
+enum PostStatus {
+  DRAFT
+  PUBLISHED
+}
+
+enum EmailStatus {
+  SENT
+  FAILED
+}
+
+enum EncryptionType {
+  SSL
+  TLS
+  NONE
+}
+
+// ─── Models ──────────────────────────────────────────────────────────────────
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  name         String
+  role         Role     @default(MANAGER)
+  passwordHash String
+  createdAt    DateTime @default(now())
+}
+
+model Lead {
+  id          String   @id @default(uuid())
+  firstName   String
+  lastName    String
+  email       String
+  phone       String
+  serviceDate String
+  serviceType String
+  originZip   String?
+  destZip     String?
+  homeSize    String?
+  estimate    String?
+  createdAt   DateTime @default(now())
+}
+
+/// Singleton row (id = 1) — general site settings
+model Setting {
+  id            Int    @id @default(1)
+  companyName   String @default("GetMoveCost.com")
+  tagline       String @default("Free Moving & Cleaning Cost Estimator")
+  logoUrlHeader String @default("")
+  logoUrlFooter String @default("")
+  faviconUrl    String @default("")
+  adminEmail    String @default("admin@getmovecost.com")
+  socialLinks   Json   @default("{}")
+  marketRates   Json?
+}
+
+/// Singleton row (id = 1) — SMTP configuration
+model EmailConfig {
+  id         Int            @id @default(1)
+  host       String         @default("")
+  port       Int            @default(587)
+  username   String         @default("")
+  password   String         @default("")
+  fromEmail  String         @default("")
+  encryption EncryptionType @default(TLS)
+}
+
+model BlogCategory {
+  id   String @id @default(uuid())
+  name String
+  slug String @unique
+}
+
+model BlogPost {
+  id        String     @id @default(uuid())
+  title     String
+  slug      String     @unique
+  content   String     @default("")
+  excerpt   String     @default("")
+  category  String     @default("")
+  tags      String[]
+  status    PostStatus @default(DRAFT)
+  metaTitle String     @default("")
+  metaDesc  String     @default("")
+  canonical String     @default("")
+  ogTitle   String     @default("")
+  ogDesc    String     @default("")
+  ogImage   String     @default("")
+  authorId  String
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model EmailLog {
+  id      String      @id @default(uuid())
+  to      String
+  subject String
+  sentAt  DateTime    @default(now())
+  status  EmailStatus
+  content String
+  error   String?
+}
+
+model ActivityLog {
+  id        String   @id @default(uuid())
+  userId    String
+  userEmail String
+  action    String
+  resource  String
+  details   String
+  createdAt DateTime @default(now())
+}
+
+model Page {
+  slug      String   @id
+  title     String
+  content   String   @default("")
+  metaTitle String   @default("")
+  metaDesc  String   @default("")
+  canonical String   @default("")
+  ogTitle   String   @default("")
+  ogDesc    String   @default("")
+  ogImage   String   @default("")
+  updatedAt DateTime @updatedAt
+}

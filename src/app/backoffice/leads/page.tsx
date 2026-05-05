@@ -14,6 +14,9 @@ interface Lead {
   serviceDate: string;
   originZip?: string;
   destZip?: string;
+  originCity?: string;
+  destCity?: string;
+  distanceMiles?: number;
   homeSize?: string;
   createdAt: string;
 }
@@ -229,9 +232,11 @@ export default function LeadsPage() {
               <dt className="text-slate-400">Estimate</dt>
               <dd className="text-white">{viewLead.estimate ?? '—'}</dd>
               <dt className="text-slate-400">Origin ZIP</dt>
-              <dd className="text-white">{viewLead.originZip ?? '—'}</dd>
+              <dd className="text-white">{viewLead.originZip ?? '—'}{viewLead.originCity ? ` (${viewLead.originCity})` : ''}</dd>
               <dt className="text-slate-400">Destination ZIP</dt>
-              <dd className="text-white">{viewLead.destZip ?? '—'}</dd>
+              <dd className="text-white">{viewLead.destZip ?? '—'}{viewLead.destCity ? ` (${viewLead.destCity})` : ''}</dd>
+              <dt className="text-slate-400">Distance</dt>
+              <dd className="text-white">{viewLead.distanceMiles != null ? `${viewLead.distanceMiles} mi` : '—'}</dd>
               <dt className="text-slate-400">Home Size</dt>
               <dd className="text-white">{viewLead.homeSize ?? '—'}</dd>
               <dt className="text-slate-400">Reference ID</dt>

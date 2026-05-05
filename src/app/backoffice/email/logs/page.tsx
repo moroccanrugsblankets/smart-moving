@@ -9,7 +9,8 @@ interface EmailLog {
   subject: string;
   sentAt: string;
   status: 'sent' | 'failed';
-  body?: string;
+  content?: string;
+  error?: string;
 }
 
 function formatDate(iso: string) {
@@ -80,7 +81,7 @@ export default function EmailLogsPage() {
                   </td>
                   <td className="px-4 py-3 text-slate-400 whitespace-nowrap">{formatDate(log.sentAt)}</td>
                   <td className="px-4 py-3 flex gap-2">
-                    {log.body && (
+                    {log.content && (
                       <button onClick={() => setSelected(log)} className="px-2 py-1 bg-slate-600 hover:bg-slate-500 text-white text-xs rounded">
                         View
                       </button>
@@ -108,8 +109,13 @@ export default function EmailLogsPage() {
               </div>
               <button onClick={() => setSelected(null)} className="text-slate-400 hover:text-white text-xl leading-none">×</button>
             </div>
-            <div className="overflow-auto flex-1 bg-slate-700 rounded p-4 text-slate-300 text-sm whitespace-pre-wrap font-mono">
-              {selected.body}
+            <div className="overflow-auto flex-1 bg-white rounded">
+              <iframe
+                srcDoc={selected.content}
+                className="w-full h-full min-h-[400px] border-0"
+                sandbox=""
+                title="Email preview"
+              />
             </div>
           </div>
         </div>

@@ -17,9 +17,13 @@ export interface LeadEmailData {
 
 function formatCurrency(value: string | undefined): string {
   if (!value) return 'N/A';
+  // If already formatted as a currency range (e.g. "$1,945 – $2,377"), return as-is
+  if (/^\$[\d,]+\s*–\s*\$[\d,]+$/.test(value)) return value;
+  // If starts with $, return as-is
+  if (value.startsWith('$')) return value;
   const numeric = parseFloat(value.replace(/[^0-9.]/g, ''));
   if (isNaN(numeric)) return value;
-  return `$${numeric.toFixed(2)}`;
+  return `$${numeric.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
 
 function formatDateUS(value: string | undefined): string {

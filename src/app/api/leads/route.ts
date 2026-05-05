@@ -2,6 +2,36 @@ import { NextRequest, NextResponse } from 'next/server';
 import { addLead, getLeads } from '@/lib/leadsStore';
 import { leadsFileStore, settingsStore } from '@/lib/fileStore';
 import { sendLeadEmails } from '@/lib/emailService';
+import zipcodes from 'zipcodes';
+
+const ROAD_CORRECTION = 1.15;
+const TO_RAD = Math.PI / 180;
+const EARTH_RADIUS_MILES = 3958.8;
+
+function haversineDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const dLat = (lat2 - lat1) * TO_RAD;
+  const dLon = (lon2 - lon1) * TO_RAD;
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(lat1 * TO_RAD) * Math.cos(lat2 * TO_RAD) * Math.sin(dLon / 2) ** 2;
+  return EARTH_RADIUS_MILES * 2 * Math.asin(Math.sqrt(a));
+}
+
+function zipToCity(zip: string | undefined): string | undefined {
+  if (!zip) return undefined;
+  const info = zipcodes.lookup(zip);
+  if (!info) return undefined;
+  return `${info.city}, ${info.state}`;
+}
+
+function estimateDistance(originZip: string | undefined, destZip: string | undefined): number | undefined {
+  if (!originZip || !destZip) return undefined;
+  const origin = zipcodes.lookup(originZip);
+  const dest   = zipcodes.lookup(destZip);
+  if (!origin || !dest) return undefined;
+  const straight = haversineDistance(origin.latitude, origin.longitude, dest.latitude, dest.longitude);
+  return Math.round(straight * ROAD_CORRECTION);
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -52,7 +82,14 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET() {
-  return NextResponse.json(await getLeads());
+  const leads = await getLeads();
+  const enriched = leads.map(l => ({
+    ...l,
+    originCity: zipToCity(l.originZip),
+    destCity: zipToCity(l.destZip),
+    distanceMiles: estimateDistance(l.originZip, l.destZip),
+  }));
+  return NextResponse.json(enriched);
 }
 
 export async function DELETE(req: NextRequest) {

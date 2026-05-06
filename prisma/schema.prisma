@@ -132,16 +132,25 @@ model ActivityLog {
 }
 
 model Page {
-  slug      String   @id
-  title     String
-  content   String   @default("")
-  metaTitle String   @default("")
-  metaDesc  String   @default("")
-  canonical String   @default("")
-  ogTitle   String   @default("")
-  ogDesc    String   @default("")
-  ogImage   String   @default("")
-  updatedAt DateTime @updatedAt
+  slug         String   @id
+  title        String
+  content      String   @default("")
+  metaTitle    String   @default("")
+  metaDesc     String   @default("")
+  canonical    String   @default("")
+  ogTitle      String   @default("")
+  ogDesc       String   @default("")
+  ogImage      String   @default("")
+  showInFooter Boolean  @default(true)
+  footerOrder  Int      @default(0)
+  updatedAt    DateTime @updatedAt
+}
+
+/// Singleton row (id = 1) — footer configuration
+model FooterSettings {
+  id          Int    @id @default(1)
+  description String @default("Cost estimates are based on U.S. Bureau of Labor Statistics data and regional market surveys (2026). Actual prices may vary.")
+  customLinks Json   @default("[]")
 }
 
 model EmailTemplate {

@@ -16,6 +16,7 @@ const NAV_ITEMS: NavItem[] = [
   { label: 'Blog', href: '/backoffice/blog', icon: '✍️' },
   { label: 'Blog Categories', href: '/backoffice/blog/categories', icon: '🏷️' },
   { label: 'Pages', href: '/backoffice/pages', icon: '📄' },
+  { label: 'Footer Settings', href: '/backoffice/footer', icon: '🔗', roles: ['admin'] },
   { label: 'Market Data', href: '/backoffice/market-data', icon: '🗺️', roles: ['admin'] },
   { label: 'Settings', href: '/backoffice/settings', icon: '⚙️', roles: ['admin'] },
   { label: 'Users', href: '/backoffice/users', icon: '👤', roles: ['admin'] },

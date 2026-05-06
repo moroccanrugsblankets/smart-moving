@@ -68,7 +68,13 @@ export default function PagesPage() {
               <input
                 type="text"
                 value={newSlug}
-                onChange={e => setNewSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '-'))}
+                onChange={e => setNewSlug(
+                  e.target.value
+                    .toLowerCase()
+                    .replace(/[^a-z0-9-]/g, '-')
+                    .replace(/-{2,}/g, '-')
+                    .replace(/^-+|-+$/g, '')
+                )}
                 placeholder="e.g. contact-us"
                 className="w-full px-3 py-2 bg-slate-600 border border-slate-500 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />

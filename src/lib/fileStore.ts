@@ -109,7 +109,20 @@ export interface PageContent {
   ogTitle: string;
   ogDesc: string;
   ogImage: string;
+  showInFooter: boolean;
+  footerOrder: number;
   updatedAt: string;
+}
+
+export interface FooterLink {
+  id: string;
+  label: string;
+  url: string;
+}
+
+export interface FooterSettingsData {
+  description: string;
+  customLinks: FooterLink[];
 }
 
 export interface StoredLead {
@@ -578,11 +591,11 @@ export const pagesStore = {
     const count = await prisma.page.count();
     if (count === 0) {
       await Promise.all(
-        defaultPages.map(p =>
+        defaultPages.map((p, i) =>
           prisma.page.upsert({
             where: { slug: p.slug },
             update: {},
-            create: { slug: p.slug, title: p.title },
+            create: { slug: p.slug, title: p.title, showInFooter: true, footerOrder: i },
           })
         )
       );
@@ -598,6 +611,8 @@ export const pagesStore = {
       ogTitle: p.ogTitle,
       ogDesc: p.ogDesc,
       ogImage: p.ogImage,
+      showInFooter: p.showInFooter,
+      footerOrder: p.footerOrder,
       updatedAt: p.updatedAt.toISOString(),
     }));
   },
@@ -614,6 +629,8 @@ export const pagesStore = {
       ogTitle: p.ogTitle,
       ogDesc: p.ogDesc,
       ogImage: p.ogImage,
+      showInFooter: p.showInFooter,
+      footerOrder: p.footerOrder,
       updatedAt: p.updatedAt.toISOString(),
     };
   },
@@ -629,6 +646,8 @@ export const pagesStore = {
         ...(data.ogTitle !== undefined && { ogTitle: data.ogTitle }),
         ...(data.ogDesc !== undefined && { ogDesc: data.ogDesc }),
         ...(data.ogImage !== undefined && { ogImage: data.ogImage }),
+        ...(data.showInFooter !== undefined && { showInFooter: data.showInFooter }),
+        ...(data.footerOrder !== undefined && { footerOrder: data.footerOrder }),
       },
       create: {
         slug,
@@ -640,6 +659,8 @@ export const pagesStore = {
         ogTitle: data.ogTitle ?? '',
         ogDesc: data.ogDesc ?? '',
         ogImage: data.ogImage ?? '',
+        showInFooter: data.showInFooter ?? true,
+        footerOrder: data.footerOrder ?? 0,
       },
     });
     return {
@@ -652,6 +673,8 @@ export const pagesStore = {
       ogTitle: p.ogTitle,
       ogDesc: p.ogDesc,
       ogImage: p.ogImage,
+      showInFooter: p.showInFooter,
+      footerOrder: p.footerOrder,
       updatedAt: p.updatedAt.toISOString(),
     };
   },
@@ -857,5 +880,37 @@ export const emailTemplatesStore = {
       data: { htmlContent: existing.defaultContent },
     });
     return mapEmailTemplate(t);
+  },
+};
+
+const defaultFooterSettings: FooterSettingsData = {
+  description:
+    'Cost estimates are based on U.S. Bureau of Labor Statistics data and regional market surveys (2026). Actual prices may vary.',
+  customLinks: [],
+};
+
+export const footerSettingsStore = {
+  get: async (): Promise<FooterSettingsData> => {
+    const row = await prisma.footerSettings.findUnique({ where: { id: 1 } });
+    if (!row) return defaultFooterSettings;
+    return {
+      description: row.description,
+      customLinks: (row.customLinks ?? []) as unknown as FooterLink[],
+    };
+  },
+  save: async (data: FooterSettingsData): Promise<void> => {
+    const links = data.customLinks as unknown as Prisma.InputJsonValue;
+    await prisma.footerSettings.upsert({
+      where: { id: 1 },
+      update: {
+        description: data.description,
+        customLinks: links,
+      },
+      create: {
+        id: 1,
+        description: data.description,
+        customLinks: links,
+      },
+    });
   },
 };

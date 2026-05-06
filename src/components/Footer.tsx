@@ -1,15 +1,48 @@
 import Link from 'next/link';
+import { pagesStore, footerSettingsStore, type FooterLink } from '@/lib/fileStore';
 
-export default function Footer() {
+const DEFAULT_DESCRIPTION =
+  'Cost estimates are based on U.S. Bureau of Labor Statistics data and regional market surveys (2026). Actual prices may vary.';
+
+const DEFAULT_LEGAL_LINKS = [
+  { href: '/privacy', label: 'Privacy Policy' },
+  { href: '/do-not-sell', label: 'Do Not Sell My Personal Information (CCPA)' },
+  { href: '/terms', label: 'Terms of Service' },
+];
+
+async function getFooterData() {
+  try {
+    const [pages, footerSettings] = await Promise.all([
+      pagesStore.getAll(),
+      footerSettingsStore.get(),
+    ]);
+
+    const footerPages = pages
+      .filter(p => p.showInFooter)
+      .sort((a, b) => a.footerOrder - b.footerOrder)
+      .map(p => ({ href: `/${p.slug}`, label: p.title }));
+
+    const customLinks: FooterLink[] = footerSettings.customLinks ?? [];
+    const allLegalLinks = [
+      ...footerPages,
+      ...customLinks.map(l => ({ href: l.url, label: l.label })),
+    ];
+
+    return { description: footerSettings.description, legalLinks: allLegalLinks };
+  } catch {
+    return { description: DEFAULT_DESCRIPTION, legalLinks: DEFAULT_LEGAL_LINKS };
+  }
+}
+
+export default async function Footer() {
+  const { description, legalLinks } = await getFooterData();
+
   return (
     <footer className="bg-slate-800 text-slate-300 text-sm mt-16">
       <div className="max-w-6xl mx-auto px-4 py-10 grid md:grid-cols-3 gap-8">
         <div>
           <p className="font-bold text-white mb-2">GetMoveCost.com</p>
-          <p className="text-xs leading-relaxed">
-            Cost estimates are based on U.S. Bureau of Labor Statistics data and regional market
-            surveys (2026). Actual prices may vary.
-          </p>
+          <p className="text-xs leading-relaxed">{description}</p>
         </div>
         <div>
           <p className="font-bold text-white mb-2">Quick Links</p>
@@ -22,22 +55,18 @@ export default function Footer() {
             </li>
           </ul>
         </div>
-        <div>
-          <p className="font-bold text-white mb-2">Legal</p>
-          <ul className="space-y-1 text-xs">
-            <li>
-              <Link href="/privacy" className="hover:text-white">Privacy Policy</Link>
-            </li>
-            <li>
-              <Link href="/do-not-sell" className="hover:text-white">
-                Do Not Sell My Personal Information (CCPA)
-              </Link>
-            </li>
-            <li>
-              <Link href="/terms" className="hover:text-white">Terms of Service</Link>
-            </li>
-          </ul>
-        </div>
+        {legalLinks.length > 0 && (
+          <div>
+            <p className="font-bold text-white mb-2">Legal</p>
+            <ul className="space-y-1 text-xs">
+              {legalLinks.map(link => (
+                <li key={link.href}>
+                  <Link href={link.href} className="hover:text-white">{link.label}</Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
       <div className="border-t border-slate-700 text-center py-4 text-xs text-slate-500">
         © 2026 GetMoveCost.com. All rights reserved. |{' '}

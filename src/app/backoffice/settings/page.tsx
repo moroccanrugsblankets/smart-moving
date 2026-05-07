@@ -17,12 +17,13 @@ interface Settings {
     linkedin?: string;
     instagram?: string;
   };
+  gtmId: string;
 }
 
 export default function SettingsPage() {
   const [settings, setSettings] = useState<Settings>({
     companyName: '', tagline: '', logoUrlHeader: '', logoUrlFooter: '',
-    faviconUrl: '', adminEmail: '', socialLinks: {},
+    faviconUrl: '', adminEmail: '', socialLinks: {}, gtmId: '',
   });
   const [saving, setSaving] = useState(false);
   const { toasts, addToast, removeToast } = useToast();
@@ -118,6 +119,24 @@ export default function SettingsPage() {
               />
             </div>
           ))}
+        </div>
+
+        <div className="bg-slate-700 rounded-lg p-6 space-y-4">
+          <h2 className="text-white font-semibold">Google Tag Manager</h2>
+          <p className="text-slate-400 text-sm">
+            Enter your GTM container ID to enable Google Tag Manager on all frontend pages.
+            Leave blank to disable.
+          </p>
+          <div>
+            <label className="block text-slate-400 text-sm mb-1">GTM Container ID</label>
+            <input
+              type="text"
+              value={settings.gtmId}
+              onChange={e => set('gtmId', e.target.value.trim())}
+              placeholder="GTM-XXXXXXX"
+              className="w-full px-3 py-2 bg-slate-600 border border-slate-500 rounded text-white text-sm font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
         </div>
 
         <button

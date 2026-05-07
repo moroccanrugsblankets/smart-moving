@@ -70,6 +70,7 @@ model Setting {
   adminEmail    String @default("admin@getmovecost.com")
   socialLinks   Json   @default("{}")
   marketRates   Json?
+  gtmId         String @default("")
 }
 
 /// Singleton row (id = 1) — SMTP configuration

@@ -29,6 +29,7 @@ export interface Settings {
     linkedin?: string;
     instagram?: string;
   };
+  gtmId: string;
 }
 
 export interface BlogPost {
@@ -184,6 +185,7 @@ const defaultSettings: Settings = {
   faviconUrl: '',
   adminEmail: 'admin@getmovecost.com',
   socialLinks: {},
+  gtmId: '',
 };
 
 const defaultEmailConfig: EmailConfig = {
@@ -297,6 +299,7 @@ export const settingsStore = {
       faviconUrl: row.faviconUrl,
       adminEmail: row.adminEmail,
       socialLinks: (row.socialLinks ?? {}) as Settings['socialLinks'],
+      gtmId: row.gtmId ?? '',
     };
   },
   save: async (settings: Settings): Promise<void> => {
@@ -310,6 +313,7 @@ export const settingsStore = {
         faviconUrl: settings.faviconUrl,
         adminEmail: settings.adminEmail,
         socialLinks: settings.socialLinks,
+        gtmId: settings.gtmId ?? '',
       },
       create: {
         id: 1,
@@ -320,6 +324,7 @@ export const settingsStore = {
         faviconUrl: settings.faviconUrl,
         adminEmail: settings.adminEmail,
         socialLinks: settings.socialLinks,
+        gtmId: settings.gtmId ?? '',
       },
     });
   },
@@ -662,6 +667,45 @@ export const pagesStore = {
         showInFooter: data.showInFooter ?? true,
         footerOrder: data.footerOrder ?? 0,
       },
+    });
+    return {
+      slug: p.slug,
+      title: p.title,
+      content: p.content,
+      metaTitle: p.metaTitle,
+      metaDesc: p.metaDesc,
+      canonical: p.canonical,
+      ogTitle: p.ogTitle,
+      ogDesc: p.ogDesc,
+      ogImage: p.ogImage,
+      showInFooter: p.showInFooter,
+      footerOrder: p.footerOrder,
+      updatedAt: p.updatedAt.toISOString(),
+    };
+  },
+  rename: async (oldSlug: string, newSlug: string, data: Partial<Omit<PageContent, 'slug' | 'updatedAt'>>): Promise<PageContent> => {
+    const existing = await prisma.page.findUnique({ where: { slug: oldSlug } });
+    if (!existing) throw new Error(`Page not found: ${oldSlug}`);
+    const conflict = await prisma.page.findUnique({ where: { slug: newSlug } });
+    if (conflict) throw new Error(`Slug already in use: ${newSlug}`);
+    const p = await prisma.$transaction(async (tx) => {
+      const created = await tx.page.create({
+        data: {
+          slug: newSlug,
+          title: data.title ?? existing.title,
+          content: data.content ?? existing.content,
+          metaTitle: data.metaTitle ?? existing.metaTitle,
+          metaDesc: data.metaDesc ?? existing.metaDesc,
+          canonical: data.canonical ?? existing.canonical,
+          ogTitle: data.ogTitle ?? existing.ogTitle,
+          ogDesc: data.ogDesc ?? existing.ogDesc,
+          ogImage: data.ogImage ?? existing.ogImage,
+          showInFooter: data.showInFooter ?? existing.showInFooter,
+          footerOrder: data.footerOrder ?? existing.footerOrder,
+        },
+      });
+      await tx.page.delete({ where: { slug: oldSlug } });
+      return created;
     });
     return {
       slug: p.slug,

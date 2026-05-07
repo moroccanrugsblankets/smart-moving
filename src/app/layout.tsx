@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import GtmScript from '@/components/GtmScript';
 
 export const metadata: Metadata = {
   title: 'GetMoveCost.com — Free Moving & Cleaning Cost Estimator',
@@ -12,6 +13,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body className="font-sans bg-slate-50 min-h-screen flex flex-col">
+        <GtmScript />
         {children}
       </body>
     </html>

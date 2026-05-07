@@ -6,7 +6,7 @@ export default function Header() {
       <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
         <Link href="/" className="text-xl font-extrabold tracking-tight flex items-center gap-2">
           <span className="text-yellow-300 text-2xl">📦</span>
-          <span>Smart<span className="text-yellow-300">Moving</span>.com</span>
+          <span><span className="text-yellow-300">Get</span>Move<span className="text-yellow-300">Cost</span>.com</span>
         </Link>
         <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
           <Link

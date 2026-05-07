@@ -12,7 +12,7 @@ export default function GtmScript() {
       .then(data => {
         if (data?.gtmId) setGtmId(data.gtmId);
       })
-      .catch(() => {});
+      .catch((err) => { console.error('[GtmScript] Failed to load GTM config', err); });
   }, []);
 
   if (!gtmId) return null;

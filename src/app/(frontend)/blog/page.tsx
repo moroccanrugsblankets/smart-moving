@@ -16,7 +16,7 @@ export default async function BlogListPage() {
     <div className="bg-slate-50/70 py-14 md:py-20">
       <div className="max-w-5xl mx-auto px-4">
         <div className="mb-10 md:mb-14">
-          <p className="inline-flex items-center rounded-full bg-blue-50 text-blue-700 px-3 py-1 text-xs font-semibold tracking-wide uppercase">Insights</p>
+          <span className="inline-flex items-center rounded-full bg-blue-50 text-blue-700 px-3 py-1 text-xs font-semibold tracking-wide uppercase">Insights</span>
           <h1 className="text-4xl md:text-5xl font-extrabold text-slate-900 mt-4">Blog</h1>
           <p className="text-slate-600 mt-3 max-w-2xl">
             Guides and advice to plan your move with more confidence.

@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { blogStore } from '@/lib/fileStore';
+import { formatDateTimeAttribute, formatPublicationDate, UNKNOWN_PUBLICATION_DATE } from '@/lib/dateUtils';
 
 export const dynamic = 'force-dynamic';
 
@@ -25,9 +26,14 @@ export default async function BlogListPage() {
       {published.length === 0 ? (
           <p className="text-slate-500">No articles published yet.</p>
       ) : (
-          <div className="grid gap-6 md:gap-8">
-          {published.map(post => (
-              <article key={post.id} className="bg-white border border-slate-200 rounded-2xl p-5 md:p-6 shadow-sm hover:shadow-md hover:border-blue-200 transition-all">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 md:gap-8">
+          {published.map(post => {
+            const publicationDate = formatPublicationDate(post.createdAt);
+            const isUnknownPublicationDate = publicationDate === UNKNOWN_PUBLICATION_DATE;
+            const publicationDateTime = formatDateTimeAttribute(post.createdAt);
+
+            return (
+              <article key={post.id} className="bg-white border border-slate-200 rounded-2xl p-5 md:p-6 shadow-sm hover:shadow-md hover:border-blue-200 transition-all h-full flex flex-col">
               {post.featuredImage && (
                 <img
                   src={post.featuredImage}
@@ -43,14 +49,22 @@ export default async function BlogListPage() {
               {post.excerpt && (
                   <p className="text-slate-600 leading-relaxed mb-4">{post.excerpt}</p>
               )}
-              <Link
-                href={`/blog/${post.slug}`}
-                  className="inline-flex items-center gap-1 text-blue-700 text-sm font-semibold hover:text-blue-800"
-              >
-                Read more →
-              </Link>
-            </article>
-          ))}
+                <Link
+                  href={`/blog/${post.slug}`}
+                  className="inline-flex items-center gap-1 text-blue-700 text-sm font-semibold hover:text-blue-800 mt-auto"
+                >
+                  <span>Lire l’article</span>
+                  <span aria-hidden="true">·</span>
+                  {publicationDateTime && !isUnknownPublicationDate ? (
+                    <time dateTime={publicationDateTime}>{publicationDate}</time>
+                  ) : (
+                    <span>{publicationDate}</span>
+                  )}
+                  <span aria-hidden="true">→</span>
+                </Link>
+              </article>
+            );
+          })}
         </div>
       )}
       </div>

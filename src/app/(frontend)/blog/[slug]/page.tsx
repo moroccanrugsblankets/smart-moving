@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { blogStore } from '@/lib/fileStore';
+import { formatDateTimeAttribute, formatPublicationDate, UNKNOWN_PUBLICATION_DATE } from '@/lib/dateUtils';
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -35,6 +36,9 @@ export default async function BlogPostPage({ params }: Props) {
   const posts = await blogStore.getAll();
   const post = posts.find(p => p.slug === slug && p.status === 'published');
   if (!post) notFound();
+  const publicationDate = formatPublicationDate(post.createdAt);
+  const publicationDateTime = formatDateTimeAttribute(post.createdAt);
+  const isUnknownPublicationDate = publicationDate === UNKNOWN_PUBLICATION_DATE;
 
   return (
     <div className="bg-slate-50/70 py-14 md:py-20">
@@ -43,7 +47,15 @@ export default async function BlogPostPage({ params }: Props) {
           <Link href="/blog" className="hover:text-blue-600">Blog</Link>
         <span className="mx-2">›</span>
         <span className="text-slate-700">{post.title}</span>
-      </nav>
+        </nav>
+        <p className="mb-6 text-sm text-slate-500">
+          Publié le{' '}
+          {publicationDateTime && !isUnknownPublicationDate ? (
+            <time dateTime={publicationDateTime}>{publicationDate}</time>
+          ) : (
+            <span>{publicationDate}</span>
+          )}
+        </p>
 
         <article className="bg-white border border-slate-200 rounded-2xl p-6 md:p-10 shadow-sm">
         {post.featuredImage && (

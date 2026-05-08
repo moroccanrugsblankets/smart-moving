@@ -4,3 +4,7 @@
   --color-navy: #1E40AF;
   --color-slate: #64748B;
 }
+article h2 {
+  font-size: 1.5em;
+  color: #64748B;
+}

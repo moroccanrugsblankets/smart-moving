@@ -1,6 +1,6 @@
 function parseDate(iso: string) {
   const date = new Date(iso);
-  return Number.isNaN(date.getTime()) ? null : date;
+  return isNaN(date.getTime()) ? null : date;
 }
 
 export const UNKNOWN_PUBLICATION_DATE = 'Date inconnue';

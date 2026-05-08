@@ -52,7 +52,6 @@ export default async function BlogListPage() {
                 <Link
                   href={`/blog/${post.slug}`}
                   className="inline-flex items-center gap-1 text-blue-700 text-sm font-semibold hover:text-blue-800 mt-auto"
-                  aria-label={`Lire l’article « ${post.title} »`}
                 >
                   <span>Lire l’article</span>
                   <span aria-hidden="true">·</span>

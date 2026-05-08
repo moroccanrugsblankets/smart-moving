@@ -1,16 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/apiAuth';
-import { writeFile, mkdir } from 'fs/promises';
-import path from 'path';
 
-const MIME_TO_EXT: Record<string, string> = {
-  'image/jpeg': 'jpg',
-  'image/png': 'png',
-  'image/gif': 'gif',
-  'image/webp': 'webp',
-  'image/svg+xml': 'svg',
-  'image/x-icon': 'ico',
-};
+const ALLOWED_TYPES = new Set([
+  'image/jpeg',
+  'image/png',
+  'image/gif',
+  'image/webp',
+  'image/svg+xml',
+  'image/x-icon',
+]);
 
 const MAX_SIZE = 5 * 1024 * 1024; // 5 MB
 
@@ -25,8 +23,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'No file provided' }, { status: 400 });
   }
 
-  const ext = MIME_TO_EXT[file.type];
-  if (!ext) {
+  if (!ALLOWED_TYPES.has(file.type)) {
     return NextResponse.json({ error: 'Invalid file type. Allowed: JPEG, PNG, GIF, WebP, SVG, ICO' }, { status: 400 });
   }
 
@@ -34,14 +31,23 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'File too large (max 5 MB)' }, { status: 400 });
   }
 
+  const safeName = `uploads/${Date.now()}-${crypto.randomUUID().slice(0, 8)}-${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
+
+  // Use Vercel Blob in production, local filesystem in development
+  if (process.env.BLOB_READ_WRITE_TOKEN) {
+    const { put } = await import('@vercel/blob');
+    const blob = await put(safeName, file, { access: 'public' });
+    return NextResponse.json({ url: blob.url });
+  }
+
+  // Development fallback: write to public/uploads/
+  const { writeFile, mkdir } = await import('fs/promises');
+  const path = await import('path');
+  const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
   const bytes = await file.arrayBuffer();
   const buffer = Buffer.from(bytes);
-
-  const safeName = `${Date.now()}-${crypto.randomUUID().slice(0, 8)}.${ext}`;
-  const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
-
+  const fileName = safeName.replace('uploads/', '');
   await mkdir(uploadsDir, { recursive: true });
-  await writeFile(path.join(uploadsDir, safeName), buffer);
-
-  return NextResponse.json({ url: `/uploads/${safeName}` });
+  await writeFile(path.join(uploadsDir, fileName), buffer);
+  return NextResponse.json({ url: `/uploads/${fileName}` });
 }

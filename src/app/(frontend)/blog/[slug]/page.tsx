@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { blogStore } from '@/lib/fileStore';
-import { formatPublicationDate } from '@/lib/dateUtils';
+import { formatDateTimeAttribute, formatPublicationDate } from '@/lib/dateUtils';
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -44,9 +44,13 @@ export default async function BlogPostPage({ params }: Props) {
           <Link href="/blog" className="hover:text-blue-600">Blog</Link>
         <span className="mx-2">›</span>
         <span className="text-slate-700">{post.title}</span>
-      </nav>
+        </nav>
         <p className="mb-6 text-sm text-slate-500">
-          Publié le {formatPublicationDate(post.createdAt)} ·{' '}
+          Publié le{' '}
+          <time dateTime={formatDateTimeAttribute(post.createdAt)}>
+            {formatPublicationDate(post.createdAt)}
+          </time>{' '}
+          ·{' '}
           <Link href={`/blog/${post.slug}`} className="text-blue-700 hover:text-blue-800">
             /blog/{post.slug}
           </Link>

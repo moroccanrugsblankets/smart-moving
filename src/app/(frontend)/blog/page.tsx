@@ -13,32 +13,39 @@ export default async function BlogListPage() {
   const published = posts.filter(p => p.status === 'published');
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-16">
-      <h1 className="text-3xl font-extrabold text-slate-800 mb-10">Blog</h1>
+    <div className="bg-slate-50/70 py-14 md:py-20">
+      <div className="max-w-5xl mx-auto px-4">
+        <div className="mb-10 md:mb-14">
+          <span className="inline-flex items-center rounded-full bg-blue-50 text-blue-700 px-3 py-1 text-xs font-semibold tracking-wide uppercase">Insights</span>
+          <h1 className="text-4xl md:text-5xl font-extrabold text-slate-900 mt-4">Blog</h1>
+          <p className="text-slate-600 mt-3 max-w-2xl">
+            Guides and advice to plan your move with more confidence.
+          </p>
+        </div>
       {published.length === 0 ? (
-        <p className="text-slate-500">No articles published yet.</p>
+          <p className="text-slate-500">No articles published yet.</p>
       ) : (
-        <div className="space-y-8">
+          <div className="grid gap-6 md:gap-8">
           {published.map(post => (
-            <article key={post.id} className="border-b border-slate-200 pb-8 last:border-0">
+              <article key={post.id} className="bg-white border border-slate-200 rounded-2xl p-5 md:p-6 shadow-sm hover:shadow-md hover:border-blue-200 transition-all">
               {post.featuredImage && (
                 <img
                   src={post.featuredImage}
                   alt={post.title}
-                  className="w-full h-48 object-cover rounded-xl mb-4"
+                    className="w-full h-52 object-cover rounded-xl mb-5"
                 />
               )}
-              <h2 className="text-xl font-bold text-slate-800 mb-2">
+                <h2 className="text-2xl font-bold text-slate-900 mb-3">
                 <Link href={`/blog/${post.slug}`} className="hover:text-blue-700 transition-colors">
                   {post.title}
                 </Link>
               </h2>
               {post.excerpt && (
-                <p className="text-slate-600 text-sm leading-relaxed mb-3">{post.excerpt}</p>
+                  <p className="text-slate-600 leading-relaxed mb-4">{post.excerpt}</p>
               )}
               <Link
                 href={`/blog/${post.slug}`}
-                className="text-blue-600 text-sm font-medium hover:underline"
+                  className="inline-flex items-center gap-1 text-blue-700 text-sm font-semibold hover:text-blue-800"
               >
                 Read more →
               </Link>
@@ -46,6 +53,7 @@ export default async function BlogListPage() {
           ))}
         </div>
       )}
+      </div>
     </div>
   );
 }

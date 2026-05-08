@@ -2,6 +2,7 @@
 
 import { useState, useEffect, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Toast, useToast } from '@/components/Toast';
 import RichTextEditor from '@/components/RichTextEditor';
 import ImageUploadField from '@/components/ImageUploadField';
@@ -138,14 +139,34 @@ export default function BlogForm({ initialData, postId }: BlogFormProps) {
         <div>
           <div className="flex items-center justify-between mb-1">
             <label className="text-slate-400 text-sm">Slug</label>
-            <button
-              type="button"
-              onClick={regenerateSlug}
-              className="text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1"
-              title="Regenerate slug from title"
-            >
-              ↺ Regenerate from title
-            </button>
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={regenerateSlug}
+                className="text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1"
+                title="Regenerate slug from title"
+              >
+                ↺ Regenerate from title
+              </button>
+              {form.slug && form.status === 'published' ? (
+                <Link
+                  href={`/blog/${form.slug}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs px-2 py-1 rounded bg-emerald-600 hover:bg-emerald-700 text-white"
+                  title="Open preview in new tab"
+                >
+                  Preview
+                </Link>
+              ) : (
+                <span
+                  className="text-xs px-2 py-1 rounded bg-slate-600 text-slate-300 cursor-not-allowed"
+                  title="Preview available when post is published and has a slug"
+                >
+                  Preview
+                </span>
+              )}
+            </div>
           </div>
           <input
             type="text"
@@ -250,4 +271,3 @@ export default function BlogForm({ initialData, postId }: BlogFormProps) {
     </form>
   );
 }
-

@@ -148,15 +148,24 @@ export default function BlogForm({ initialData, postId }: BlogFormProps) {
               >
                 ↺ Regenerate from title
               </button>
-              <Link
-                href={form.slug ? `/blog/${form.slug}` : '#'}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`text-xs px-2 py-1 rounded ${form.slug && form.status === 'published' ? 'bg-emerald-600 hover:bg-emerald-700 text-white' : 'bg-slate-600 text-slate-300 pointer-events-none cursor-not-allowed'}`}
-                title={form.status === 'published' ? 'Open preview in new tab' : 'Preview available when post is published'}
-              >
-                Preview
-              </Link>
+              {form.slug && form.status === 'published' ? (
+                <Link
+                  href={`/blog/${form.slug}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs px-2 py-1 rounded bg-emerald-600 hover:bg-emerald-700 text-white"
+                  title="Open preview in new tab"
+                >
+                  Preview
+                </Link>
+              ) : (
+                <span
+                  className="text-xs px-2 py-1 rounded bg-slate-600 text-slate-300 cursor-not-allowed"
+                  title="Preview available when post is published and has a slug"
+                >
+                  Preview
+                </span>
+              )}
             </div>
           </div>
           <input

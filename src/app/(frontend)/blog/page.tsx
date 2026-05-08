@@ -48,7 +48,7 @@ export default async function BlogListPage() {
                   href={`/blog/${post.slug}`}
                   className="inline-flex items-center gap-1 text-blue-700 text-sm font-semibold hover:text-blue-800 mt-auto"
                 >
-                  <span>Published</span>
+                  <span>Read article published on</span>
                   <time dateTime={formatDateTimeAttribute(post.createdAt)}>
                     {formatPublicationDate(post.createdAt)}
                   </time>

@@ -101,7 +101,7 @@ export default function BlogPage() {
             </thead>
             <tbody>
               {filtered.map(post => {
-                const canPreview = post.status === 'published';
+                const canPreview = post.status === 'published' && !!post.slug;
                 const previewClassName = canPreview
                   ? 'px-2 py-1 text-xs rounded bg-emerald-600 hover:bg-emerald-700 text-white'
                   : 'px-2 py-1 text-xs rounded bg-slate-500 text-slate-200 cursor-not-allowed pointer-events-none';

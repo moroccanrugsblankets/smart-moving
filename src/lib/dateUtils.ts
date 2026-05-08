@@ -3,7 +3,9 @@ function parseDate(iso: string) {
   return Number.isNaN(date.getTime()) ? null : date;
 }
 
-export function formatPublicationDate(iso: string, fallback = 'Date inconnue') {
+export const UNKNOWN_PUBLICATION_DATE = 'Date inconnue';
+
+export function formatPublicationDate(iso: string, fallback = UNKNOWN_PUBLICATION_DATE) {
   const date = parseDate(iso);
   if (!date) return fallback;
   return date.toLocaleDateString('fr-FR', {
@@ -15,5 +17,5 @@ export function formatPublicationDate(iso: string, fallback = 'Date inconnue') {
 
 export function formatDateTimeAttribute(iso: string) {
   const date = parseDate(iso);
-  return date ? date.toISOString() : undefined;
+  return date ? date.toISOString() : null;
 }

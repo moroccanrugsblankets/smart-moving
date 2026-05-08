@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { blogStore } from '@/lib/fileStore';
-import { formatDateTimeAttribute, formatPublicationDate } from '@/lib/dateUtils';
+import { formatDateTimeAttribute, formatPublicationDate, UNKNOWN_PUBLICATION_DATE } from '@/lib/dateUtils';
 
 export const dynamic = 'force-dynamic';
 
@@ -29,10 +29,8 @@ export default async function BlogListPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 md:gap-8">
           {published.map(post => {
             const publicationDate = formatPublicationDate(post.createdAt);
-            const hasValidPublicationDate = publicationDate !== 'Date inconnue';
-            const linkAriaLabel = hasValidPublicationDate
-              ? `Lire l’article « ${post.title} » publié le ${publicationDate}`
-              : `Lire l’article « ${post.title} »`;
+            const isUnknownPublicationDate = publicationDate === UNKNOWN_PUBLICATION_DATE;
+            const publicationDateTime = formatDateTimeAttribute(post.createdAt);
 
             return (
               <article key={post.id} className="bg-white border border-slate-200 rounded-2xl p-5 md:p-6 shadow-sm hover:shadow-md hover:border-blue-200 transition-all h-full flex flex-col">
@@ -54,13 +52,15 @@ export default async function BlogListPage() {
                 <Link
                   href={`/blog/${post.slug}`}
                   className="inline-flex items-center gap-1 text-blue-700 text-sm font-semibold hover:text-blue-800 mt-auto"
-                  aria-label={linkAriaLabel}
+                  aria-label={`Lire l’article « ${post.title} »`}
                 >
                   <span>Lire l’article</span>
                   <span aria-hidden="true">·</span>
-                  <time dateTime={formatDateTimeAttribute(post.createdAt)}>
-                    {publicationDate}
-                  </time>
+                  {publicationDateTime && !isUnknownPublicationDate ? (
+                    <time dateTime={publicationDateTime}>{publicationDate}</time>
+                  ) : (
+                    <span>{publicationDate}</span>
+                  )}
                   <span aria-hidden="true">→</span>
                 </Link>
               </article>

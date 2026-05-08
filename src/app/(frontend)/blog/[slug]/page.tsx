@@ -46,7 +46,7 @@ export default async function BlogPostPage({ params }: Props) {
         <span className="text-slate-700">{post.title}</span>
         </nav>
         <p className="mb-6 text-sm text-slate-500">
-          Publié le{' '}
+          Published on{' '}
           <time dateTime={formatDateTimeAttribute(post.createdAt)}>
             {formatPublicationDate(post.createdAt)}
           </time>

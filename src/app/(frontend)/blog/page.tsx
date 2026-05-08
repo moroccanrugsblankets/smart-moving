@@ -44,17 +44,15 @@ export default async function BlogListPage() {
               {post.excerpt && (
                   <p className="text-slate-600 leading-relaxed mb-4">{post.excerpt}</p>
               )}
-                <p className="text-xs text-slate-500 mb-4">
-                  Publié le{' '}
-                  <time dateTime={formatDateTimeAttribute(post.createdAt)}>
-                    {formatPublicationDate(post.createdAt)}
-                  </time>
-                </p>
                 <Link
                   href={`/blog/${post.slug}`}
                   className="inline-flex items-center gap-1 text-blue-700 text-sm font-semibold hover:text-blue-800 mt-auto"
                 >
-                  Read more ({formatPublicationDate(post.createdAt)}) →
+                  <span>Read article from</span>
+                  <time dateTime={formatDateTimeAttribute(post.createdAt)}>
+                    {formatPublicationDate(post.createdAt)}
+                  </time>
+                  <span>→</span>
                 </Link>
               </article>
           ))}

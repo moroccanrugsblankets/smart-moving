@@ -47,12 +47,14 @@ export default async function BlogListPage() {
                 <Link
                   href={`/blog/${post.slug}`}
                   className="inline-flex items-center gap-1 text-blue-700 text-sm font-semibold hover:text-blue-800 mt-auto"
+                  aria-label={`Lire l’article « ${post.title} » publié le ${formatPublicationDate(post.createdAt)}`}
                 >
-                  <span>Read article published on</span>
+                  <span>Lire l’article</span>
+                  <span aria-hidden="true">·</span>
                   <time dateTime={formatDateTimeAttribute(post.createdAt)}>
                     {formatPublicationDate(post.createdAt)}
                   </time>
-                  <span>→</span>
+                  <span aria-hidden="true">→</span>
                 </Link>
               </article>
           ))}

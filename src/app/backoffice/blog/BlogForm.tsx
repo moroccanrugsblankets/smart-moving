@@ -37,7 +37,12 @@ interface BlogFormProps {
 }
 
 function slugify(str: string) {
-  return str.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  return str
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
 }
 
 export default function BlogForm({ initialData, postId }: BlogFormProps) {
@@ -45,6 +50,7 @@ export default function BlogForm({ initialData, postId }: BlogFormProps) {
   const { toasts, addToast, removeToast } = useToast();
   const [saving, setSaving] = useState(false);
   const [categories, setCategories] = useState<BlogCategory[]>([]);
+  const [slugLocked, setSlugLocked] = useState(!!postId);
   const [form, setForm] = useState<BlogPost>({
     title: '', slug: '', content: '', excerpt: '', category: '',
     categoryIds: [], featuredImage: '',
@@ -64,11 +70,21 @@ export default function BlogForm({ initialData, postId }: BlogFormProps) {
   function set<K extends keyof BlogPost>(key: K, value: BlogPost[K]) {
     setForm(prev => {
       const next = { ...prev, [key]: value };
-      if (key === 'title' && !postId) {
+      if (key === 'title' && !slugLocked) {
         next.slug = slugify(value as string);
       }
       return next;
     });
+  }
+
+  function handleSlugChange(value: string) {
+    setSlugLocked(true);
+    setForm(prev => ({ ...prev, slug: value }));
+  }
+
+  function regenerateSlug() {
+    setSlugLocked(false);
+    setForm(prev => ({ ...prev, slug: slugify(prev.title) }));
   }
 
   function toggleCategory(id: string) {
@@ -120,9 +136,28 @@ export default function BlogForm({ initialData, postId }: BlogFormProps) {
             className="w-full px-3 py-2 bg-slate-600 border border-slate-500 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
         </div>
         <div>
-          <label className="block text-slate-400 text-sm mb-1">Slug</label>
-          <input type="text" value={form.slug} onChange={e => set('slug', e.target.value)}
-            className="w-full px-3 py-2 bg-slate-600 border border-slate-500 rounded text-white text-sm font-mono focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          <div className="flex items-center justify-between mb-1">
+            <label className="text-slate-400 text-sm">Slug</label>
+            <button
+              type="button"
+              onClick={regenerateSlug}
+              className="text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1"
+              title="Regenerate slug from title"
+            >
+              ↺ Regenerate from title
+            </button>
+          </div>
+          <input
+            type="text"
+            value={form.slug}
+            onChange={e => handleSlugChange(e.target.value)}
+            className="w-full px-3 py-2 bg-slate-600 border border-slate-500 rounded text-white text-sm font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          {form.slug && (
+            <p className="mt-1 text-xs text-slate-500 font-mono truncate">
+              /blog/<span className="text-slate-400">{form.slug}</span>
+            </p>
+          )}
         </div>
         <div>
           <label className="block text-slate-400 text-sm mb-1">Excerpt</label>

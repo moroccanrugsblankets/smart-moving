@@ -8,6 +8,14 @@ export const metadata: Metadata = {
   title: 'Blog',
 };
 
+function formatPublicationDate(iso: string) {
+  return new Date(iso).toLocaleDateString('fr-FR', {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
+  });
+}
+
 export default async function BlogListPage() {
   const posts = await blogStore.getAll();
   const published = posts.filter(p => p.status === 'published');
@@ -25,9 +33,9 @@ export default async function BlogListPage() {
       {published.length === 0 ? (
           <p className="text-slate-500">No articles published yet.</p>
       ) : (
-          <div className="grid gap-6 md:gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 md:gap-8">
           {published.map(post => (
-              <article key={post.id} className="bg-white border border-slate-200 rounded-2xl p-5 md:p-6 shadow-sm hover:shadow-md hover:border-blue-200 transition-all">
+              <article key={post.id} className="bg-white border border-slate-200 rounded-2xl p-5 md:p-6 shadow-sm hover:shadow-md hover:border-blue-200 transition-all h-full flex flex-col">
               {post.featuredImage && (
                 <img
                   src={post.featuredImage}
@@ -43,9 +51,10 @@ export default async function BlogListPage() {
               {post.excerpt && (
                   <p className="text-slate-600 leading-relaxed mb-4">{post.excerpt}</p>
               )}
+                <p className="text-xs text-slate-500 mb-4">Publié le {formatPublicationDate(post.createdAt)}</p>
               <Link
                 href={`/blog/${post.slug}`}
-                  className="inline-flex items-center gap-1 text-blue-700 text-sm font-semibold hover:text-blue-800"
+                  className="inline-flex items-center gap-1 text-blue-700 text-sm font-semibold hover:text-blue-800 mt-auto"
               >
                 Read more →
               </Link>

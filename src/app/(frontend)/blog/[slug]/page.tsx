@@ -9,6 +9,14 @@ interface Props {
 
 export const dynamic = 'force-dynamic';
 
+function formatPublicationDate(iso: string) {
+  return new Date(iso).toLocaleDateString('fr-FR', {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
+  });
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   try {
@@ -44,6 +52,12 @@ export default async function BlogPostPage({ params }: Props) {
         <span className="mx-2">›</span>
         <span className="text-slate-700">{post.title}</span>
       </nav>
+        <p className="mb-6 text-sm text-slate-500">
+          Publié le {formatPublicationDate(post.createdAt)} ·{' '}
+          <Link href={`/blog/${post.slug}`} className="text-blue-700 hover:text-blue-800">
+            /blog/{post.slug}
+          </Link>
+        </p>
 
         <article className="bg-white border border-slate-200 rounded-2xl p-6 md:p-10 shadow-sm">
         {post.featuredImage && (

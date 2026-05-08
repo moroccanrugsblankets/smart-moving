@@ -49,11 +49,7 @@ export default async function BlogPostPage({ params }: Props) {
           Publié le{' '}
           <time dateTime={formatDateTimeAttribute(post.createdAt)}>
             {formatPublicationDate(post.createdAt)}
-          </time>{' '}
-          ·{' '}
-          <Link href={`/blog/${post.slug}`} className="text-blue-700 hover:text-blue-800">
-            /blog/{post.slug}
-          </Link>
+          </time>
         </p>
 
         <article className="bg-white border border-slate-200 rounded-2xl p-6 md:p-10 shadow-sm">

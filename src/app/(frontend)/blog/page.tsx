@@ -50,13 +50,13 @@ export default async function BlogListPage() {
                     {formatPublicationDate(post.createdAt)}
                   </time>
                 </p>
-              <Link
-                href={`/blog/${post.slug}`}
+                <Link
+                  href={`/blog/${post.slug}`}
                   className="inline-flex items-center gap-1 text-blue-700 text-sm font-semibold hover:text-blue-800 mt-auto"
-              >
-                Read more →
-              </Link>
-            </article>
+                >
+                  Read more ({formatPublicationDate(post.createdAt)}) →
+                </Link>
+              </article>
           ))}
         </div>
       )}

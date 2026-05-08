@@ -2,20 +2,13 @@ import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { blogStore } from '@/lib/fileStore';
+import { formatPublicationDate } from '@/lib/dateUtils';
 
 interface Props {
   params: Promise<{ slug: string }>;
 }
 
 export const dynamic = 'force-dynamic';
-
-function formatPublicationDate(iso: string) {
-  return new Date(iso).toLocaleDateString('fr-FR', {
-    day: '2-digit',
-    month: 'long',
-    year: 'numeric',
-  });
-}
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;

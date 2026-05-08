@@ -1,20 +1,13 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { blogStore } from '@/lib/fileStore';
+import { formatPublicationDate } from '@/lib/dateUtils';
 
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Blog',
 };
-
-function formatPublicationDate(iso: string) {
-  return new Date(iso).toLocaleDateString('fr-FR', {
-    day: '2-digit',
-    month: 'long',
-    year: 'numeric',
-  });
-}
 
 export default async function BlogListPage() {
   const posts = await blogStore.getAll();

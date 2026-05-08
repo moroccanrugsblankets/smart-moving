@@ -34,16 +34,20 @@ export default async function StaticPage({ params }: Props) {
   if (!page) notFound();
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-16">
-      <h1 className="text-3xl font-extrabold text-slate-800 mb-8">{page.title}</h1>
-      {page.content ? (
-        <div
-          className="prose prose-slate max-w-none text-sm leading-relaxed"
-          dangerouslySetInnerHTML={{ __html: page.content }}
-        />
-      ) : (
-        <p className="text-slate-500 text-sm">This page has no content yet.</p>
-      )}
+    <div className="bg-slate-50/70 py-14 md:py-20">
+      <div className="max-w-4xl mx-auto px-4">
+        <article className="bg-white border border-slate-200 rounded-2xl p-6 md:p-10 shadow-sm">
+          <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-8">{page.title}</h1>
+          {page.content ? (
+            <div
+              className="content-rich"
+              dangerouslySetInnerHTML={{ __html: page.content }}
+            />
+          ) : (
+            <p className="text-slate-500 text-sm">This page has no content yet.</p>
+          )}
+        </article>
+      </div>
     </div>
   );
 }

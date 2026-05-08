@@ -7,6 +7,7 @@ import { Toast, useToast } from '@/components/Toast';
 interface BlogPost {
   id: string;
   title: string;
+  slug: string;
   category: string;
   status: 'draft' | 'published';
   createdAt: string;
@@ -110,6 +111,15 @@ export default function BlogPage() {
                   </td>
                   <td className="px-4 py-3 text-slate-400">{formatDate(post.createdAt)}</td>
                   <td className="px-4 py-3 flex gap-2">
+                    <Link
+                      href={`/blog/${post.slug}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`px-2 py-1 text-xs rounded ${post.status === 'published' ? 'bg-emerald-600 hover:bg-emerald-700 text-white' : 'bg-slate-500 text-slate-200 cursor-not-allowed pointer-events-none'}`}
+                      title={post.status === 'published' ? 'Open preview in new tab' : 'Preview available when post is published'}
+                    >
+                      Preview
+                    </Link>
                     <Link href={`/backoffice/blog/${post.id}/edit`} className="px-2 py-1 bg-slate-600 hover:bg-slate-500 text-white text-xs rounded">Edit</Link>
                     <button onClick={() => setDeleteId(post.id)} className="px-2 py-1 bg-red-600 hover:bg-red-700 text-white text-xs rounded">Delete</button>
                   </td>

@@ -53,11 +53,11 @@ export default async function BlogListPage() {
                     dateTime={publicationDateTime}
                     className="block text-slate-500 text-sm mb-3"
                   >
-                    Published date: {publicationDate}
+                    Published on {publicationDate}
                   </time>
                 ) : (
                   <span className="block text-slate-500 text-sm mb-3">
-                    Published date: {publicationDate}
+                    Published on {publicationDate}
                   </span>
                 )}
                 

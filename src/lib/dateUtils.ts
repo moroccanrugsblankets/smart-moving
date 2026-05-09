@@ -3,12 +3,12 @@ function parseDate(iso: string) {
   return isNaN(date.getTime()) ? null : date;
 }
 
-export const UNKNOWN_PUBLICATION_DATE = 'Date inconnue';
+export const UNKNOWN_PUBLICATION_DATE = 'Unknown date';
 
 export function formatPublicationDate(iso: string, fallback = UNKNOWN_PUBLICATION_DATE) {
   const date = parseDate(iso);
   if (!date) return fallback;
-  return date.toLocaleDateString('fr-FR', {
+  return date.toLocaleDateString('en-GB', {
     day: '2-digit',
     month: 'long',
     year: 'numeric',

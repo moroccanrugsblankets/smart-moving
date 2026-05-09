@@ -41,27 +41,38 @@ export default async function BlogListPage() {
                     className="w-full h-52 object-cover rounded-xl mb-5"
                 />
               )}
-                <h2 className="text-2xl font-bold text-slate-900 mb-3">
-                <Link href={`/blog/${post.slug}`} className="hover:text-blue-700 transition-colors">
-                  {post.title}
-                </Link>
-              </h2>
-              {post.excerpt && (
+                <h2 className="text-xl font-bold text-slate-900 mb-1">
+                  <Link href={`/blog/${post.slug}`} className="hover:text-blue-700 transition-colors">
+                    {post.title}
+                  </Link>
+                </h2>
+                
+                {/* Date sous le titre */}
+                {publicationDateTime && !isUnknownPublicationDate ? (
+                  <time
+                    dateTime={publicationDateTime}
+                    className="block text-slate-500 text-sm mb-3"
+                  >
+                    Published date: {publicationDate}
+                  </time>
+                ) : (
+                  <span className="block text-slate-500 text-sm mb-3">
+                    Published date: {publicationDate}
+                  </span>
+                )}
+                
+                {post.excerpt && (
                   <p className="text-slate-600 leading-relaxed mb-4">{post.excerpt}</p>
-              )}
+                )}
+                
                 <Link
                   href={`/blog/${post.slug}`}
                   className="inline-flex items-center gap-1 text-blue-700 text-sm font-semibold hover:text-blue-800 mt-auto"
                 >
-                  <span>Lire l’article</span>
-                  <span aria-hidden="true">·</span>
-                  {publicationDateTime && !isUnknownPublicationDate ? (
-                    <time dateTime={publicationDateTime}>{publicationDate}</time>
-                  ) : (
-                    <span>{publicationDate}</span>
-                  )}
+                  <span>Read article</span>
                   <span aria-hidden="true">→</span>
                 </Link>
+
               </article>
             );
           })}

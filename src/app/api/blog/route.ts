@@ -7,7 +7,7 @@ export async function GET() {
   const published = posts.filter((p: BlogPost) => {
     if (p.status !== 'published') return false;
     const publicationDate = new Date(p.createdAt).getTime();
-    return Number.isNaN(publicationDate) || publicationDate <= now;
+    return !Number.isNaN(publicationDate) && publicationDate <= now;
   });
   return NextResponse.json(published);
 }

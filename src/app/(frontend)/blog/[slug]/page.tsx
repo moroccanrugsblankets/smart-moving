@@ -12,7 +12,7 @@ export const dynamic = 'force-dynamic';
 
 function isVisiblePublishedPost(createdAt: string) {
   const publicationDate = new Date(createdAt).getTime();
-  return Number.isNaN(publicationDate) || publicationDate <= Date.now();
+  return !Number.isNaN(publicationDate) && publicationDate <= Date.now();
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {

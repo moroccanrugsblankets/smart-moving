@@ -15,7 +15,7 @@ export default async function BlogListPage() {
   const published = posts.filter(p => {
     if (p.status !== 'published') return false;
     const publicationDate = new Date(p.createdAt).getTime();
-    return Number.isNaN(publicationDate) || publicationDate <= now;
+    return !Number.isNaN(publicationDate) && publicationDate <= now;
   });
 
   return (

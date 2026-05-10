@@ -18,12 +18,13 @@ interface FooterLink {
 
 interface FooterSettingsData {
   description: string;
+  quickLinks: FooterLink[];
   customLinks: FooterLink[];
 }
 
 export default function FooterSettingsPage() {
   const [pages, setPages] = useState<PageItem[]>([]);
-  const [settings, setSettings] = useState<FooterSettingsData>({ description: '', customLinks: [] });
+  const [settings, setSettings] = useState<FooterSettingsData>({ description: '', quickLinks: [], customLinks: [] });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const { toasts, addToast, removeToast } = useToast();
@@ -104,6 +105,24 @@ export default function FooterSettingsPage() {
     setSettings(prev => ({ ...prev, customLinks: prev.customLinks.filter(l => l.id !== id) }));
   }
 
+  function addQuickLink() {
+    setSettings(prev => ({
+      ...prev,
+      quickLinks: [...prev.quickLinks, { id: crypto.randomUUID(), label: '', url: '' }],
+    }));
+  }
+
+  function updateQuickLink(id: string, key: keyof FooterLink, value: string) {
+    setSettings(prev => ({
+      ...prev,
+      quickLinks: prev.quickLinks.map(l => l.id === id ? { ...l, [key]: value } : l),
+    }));
+  }
+
+  function removeQuickLink(id: string) {
+    setSettings(prev => ({ ...prev, quickLinks: prev.quickLinks.filter(l => l.id !== id) }));
+  }
+
   if (loading) {
     return <div className="p-8 text-center text-slate-400">Loading…</div>;
   }
@@ -168,6 +187,50 @@ export default function FooterSettingsPage() {
               </div>
             ))}
           </div>
+        </div>
+
+        <div className="bg-slate-700 rounded-lg p-6 space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-white font-semibold">Quick Links</h2>
+            <button
+              type="button"
+              onClick={addQuickLink}
+              className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded"
+            >
+              + Add Link
+            </button>
+          </div>
+          {settings.quickLinks.length === 0 && (
+            <p className="text-slate-400 text-xs">No quick links yet.</p>
+          )}
+          {settings.quickLinks.map(link => (
+            <div key={link.id} className="flex gap-2 items-start">
+              <div className="flex-1 space-y-2">
+                <input
+                  type="text"
+                  placeholder="Label"
+                  value={link.label}
+                  onChange={e => updateQuickLink(link.id, 'label', e.target.value)}
+                  className="w-full px-3 py-2 bg-slate-600 border border-slate-500 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <input
+                  type="text"
+                  placeholder="URL (e.g. /about or https://…)"
+                  value={link.url}
+                  onChange={e => updateQuickLink(link.id, 'url', e.target.value)}
+                  className="w-full px-3 py-2 bg-slate-600 border border-slate-500 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <button
+                type="button"
+                onClick={() => removeQuickLink(link.id)}
+                className="px-2 py-1 bg-red-700 hover:bg-red-600 text-white text-xs rounded mt-1"
+                title="Remove"
+              >
+                ✕
+              </button>
+            </div>
+          ))}
         </div>
 
         {/* Custom links */}

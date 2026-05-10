@@ -119,10 +119,15 @@ export default function BlogForm({ initialData, postId }: BlogFormProps) {
     e.preventDefault();
     setSaving(true);
     const parsedPublicationDate = new Date(form.createdAt);
+    if (isNaN(parsedPublicationDate.getTime())) {
+      addToast('Publication date is required', 'error');
+      setSaving(false);
+      return;
+    }
     const payload = {
       ...form,
       tags: tagsStr.split(',').map(t => t.trim()).filter(Boolean),
-      createdAt: isNaN(parsedPublicationDate.getTime()) ? undefined : parsedPublicationDate.toISOString(),
+      createdAt: parsedPublicationDate.toISOString(),
     };
     try {
       const res = postId
@@ -229,14 +234,10 @@ export default function BlogForm({ initialData, postId }: BlogFormProps) {
             <label className="block text-slate-400 text-sm mb-1">Publication Date</label>
             <input
               type="datetime-local"
+              required
               value={toDateTimeLocalInputValue(form.createdAt)}
               onChange={e => {
-                const value = e.target.value;
-                if (!value) {
-                  set('createdAt', '');
-                  return;
-                }
-                const nextDate = new Date(value);
+                const nextDate = new Date(e.target.value);
                 if (!isNaN(nextDate.getTime())) set('createdAt', nextDate.toISOString());
               }}
               className="w-full px-3 py-2 bg-slate-600 border border-slate-500 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"

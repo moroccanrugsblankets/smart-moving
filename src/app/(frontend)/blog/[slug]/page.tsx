@@ -10,11 +10,18 @@ interface Props {
 
 export const dynamic = 'force-dynamic';
 
+function isVisiblePublishedPost(createdAt: string) {
+  const publicationDate = new Date(createdAt).getTime();
+  return !Number.isNaN(publicationDate) && publicationDate <= Date.now();
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   try {
     const posts = await blogStore.getAll();
-    const post = posts.find(p => p.slug === slug && p.status === 'published');
+    const post = posts.find(
+      p => p.slug === slug && p.status === 'published' && isVisiblePublishedPost(p.createdAt)
+    );
     if (!post) return {};
     return {
       title: post.metaTitle || post.title,
@@ -34,7 +41,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function BlogPostPage({ params }: Props) {
   const { slug } = await params;
   const posts = await blogStore.getAll();
-  const post = posts.find(p => p.slug === slug && p.status === 'published');
+  const post = posts.find(
+    p => p.slug === slug && p.status === 'published' && isVisiblePublishedPost(p.createdAt)
+  );
   if (!post) notFound();
   const publicationDate = formatPublicationDate(post.createdAt);
   const publicationDateTime = formatDateTimeAttribute(post.createdAt);

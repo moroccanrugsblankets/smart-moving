@@ -8,6 +8,14 @@ import BlogForm from '../../BlogForm';
 interface PostPreviewData {
   slug?: string;
   status?: 'draft' | 'published';
+  createdAt?: string;
+}
+
+function isFuturePublicationDate(iso?: string) {
+  if (!iso) return false;
+  const date = new Date(iso);
+  if (isNaN(date.getTime())) return false;
+  return date.getTime() > Date.now();
 }
 
 export default function EditBlogPostPage() {
@@ -24,7 +32,7 @@ export default function EditBlogPostPage() {
 
   if (loading) return <div className="text-slate-400 p-8">Loading…</div>;
   if (!post) return <div className="text-red-400 p-8">Post not found.</div>;
-  const canPreview = post.status === 'published' && !!post.slug;
+  const canPreview = post.status === 'published' && !!post.slug && !isFuturePublicationDate(post.createdAt);
 
   return (
     <div className="space-y-4">

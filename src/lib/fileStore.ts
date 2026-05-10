@@ -425,7 +425,9 @@ export const blogStore = {
       updatedAt: p.updatedAt.toISOString(),
     };
   },
-  update: async (id: string, data: Partial<Omit<BlogPost, 'id' | 'createdAt' | 'updatedAt'>>): Promise<BlogPost> => {
+  update: async (id: string, data: Partial<Omit<BlogPost, 'id' | 'updatedAt'>>): Promise<BlogPost> => {
+    const createdAt = data.createdAt !== undefined ? new Date(data.createdAt) : undefined;
+    const hasValidCreatedAt = !!createdAt && !isNaN(createdAt.getTime());
     const p = await prisma.blogPost.update({
       where: { id },
       data: {
@@ -445,6 +447,7 @@ export const blogStore = {
         ...(data.ogDesc !== undefined && { ogDesc: data.ogDesc }),
         ...(data.ogImage !== undefined && { ogImage: data.ogImage }),
         ...(data.authorId !== undefined && { authorId: data.authorId }),
+        ...(hasValidCreatedAt && { createdAt }),
       },
     });
     return {

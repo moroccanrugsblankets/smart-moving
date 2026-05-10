@@ -7,8 +7,13 @@ export async function GET(
 ) {
   const { slug } = await params;
   const posts = await blogStore.getAll();
+  const now = Date.now();
   const post = posts.find(
-    (p: BlogPost) => p.slug === slug && p.status === 'published'
+    (p: BlogPost) => {
+      if (p.slug !== slug || p.status !== 'published') return false;
+      const publicationDate = new Date(p.createdAt).getTime();
+      return !Number.isNaN(publicationDate) && publicationDate <= now;
+    }
   );
   if (!post) return NextResponse.json({ error: 'Not found' }, { status: 404 });
   return NextResponse.json(post);

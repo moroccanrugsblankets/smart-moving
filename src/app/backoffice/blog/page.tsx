@@ -13,6 +13,12 @@ interface BlogPost {
   createdAt: string;
 }
 
+function isFuturePublicationDate(iso: string) {
+  const date = new Date(iso);
+  if (isNaN(date.getTime())) return false;
+  return date.getTime() > Date.now();
+}
+
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
@@ -101,19 +107,26 @@ export default function BlogPage() {
             </thead>
             <tbody>
               {filtered.map(post => {
-                const canPreview = post.status === 'published' && !!post.slug;
+                const isScheduled = post.status === 'published' && isFuturePublicationDate(post.createdAt);
+                const displayStatus = isScheduled ? 'scheduled' : post.status;
+                const canPreview = post.status === 'published' && !!post.slug && !isScheduled;
                 const previewClassName = canPreview
                   ? 'px-2 py-1 text-xs rounded bg-emerald-600 hover:bg-emerald-700 text-white'
                   : 'px-2 py-1 text-xs rounded bg-slate-500 text-slate-200 cursor-not-allowed pointer-events-none';
-                const previewTitle = canPreview ? 'Open preview in new tab' : 'Preview available when post is published';
+                const previewTitle = canPreview ? 'Open preview in new tab' : 'Preview available when post is published and not scheduled';
+                const statusClassName = displayStatus === 'published'
+                  ? 'bg-green-900 text-green-300'
+                  : displayStatus === 'scheduled'
+                    ? 'bg-blue-900 text-blue-300'
+                    : 'bg-yellow-900 text-yellow-300';
 
                 return (
                   <tr key={post.id} className="border-t border-slate-600 text-slate-300">
                     <td className="px-4 py-3">{post.title}</td>
                     <td className="px-4 py-3">{post.category || '—'}</td>
                     <td className="px-4 py-3">
-                      <span className={`px-2 py-0.5 rounded text-xs ${post.status === 'published' ? 'bg-green-900 text-green-300' : 'bg-yellow-900 text-yellow-300'}`}>
-                        {post.status}
+                      <span className={`px-2 py-0.5 rounded text-xs ${statusClassName}`}>
+                        {displayStatus}
                       </span>
                     </td>
                     <td className="px-4 py-3 text-slate-400">{formatDate(post.createdAt)}</td>

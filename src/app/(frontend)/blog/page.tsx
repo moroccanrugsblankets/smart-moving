@@ -11,7 +11,12 @@ export const metadata: Metadata = {
 
 export default async function BlogListPage() {
   const posts = await blogStore.getAll();
-  const published = posts.filter(p => p.status === 'published');
+  const now = Date.now();
+  const published = posts.filter(p => {
+    if (p.status !== 'published') return false;
+    const publicationDate = new Date(p.createdAt).getTime();
+    return !Number.isNaN(publicationDate) && publicationDate <= now;
+  });
 
   return (
     <div className="bg-slate-50/70 py-14 md:py-20">

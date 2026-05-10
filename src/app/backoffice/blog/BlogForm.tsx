@@ -24,6 +24,7 @@ interface BlogPost {
   ogTitle: string;
   ogDesc: string;
   ogImage: string;
+  createdAt: string;
 }
 
 interface BlogCategory {
@@ -46,6 +47,21 @@ function slugify(str: string) {
     .replace(/^-|-$/g, '');
 }
 
+function isFuturePublicationDate(iso?: string) {
+  if (!iso) return false;
+  const date = new Date(iso);
+  if (isNaN(date.getTime())) return false;
+  return date.getTime() > Date.now();
+}
+
+function toDateTimeLocalInputValue(iso?: string) {
+  if (!iso) return '';
+  const date = new Date(iso);
+  if (isNaN(date.getTime())) return '';
+  const timezoneOffset = date.getTimezoneOffset() * 60000;
+  return new Date(date.getTime() - timezoneOffset).toISOString().slice(0, 16);
+}
+
 export default function BlogForm({ initialData, postId }: BlogFormProps) {
   const router = useRouter();
   const { toasts, addToast, removeToast } = useToast();
@@ -57,9 +73,11 @@ export default function BlogForm({ initialData, postId }: BlogFormProps) {
     categoryIds: [], featuredImage: '',
     tags: [], status: 'draft',
     metaTitle: '', metaDesc: '', canonical: '', ogTitle: '', ogDesc: '', ogImage: '',
+    createdAt: new Date().toISOString(),
     ...initialData,
   });
   const [tagsStr, setTagsStr] = useState(initialData?.tags?.join(', ') ?? '');
+  const isScheduled = form.status === 'published' && isFuturePublicationDate(form.createdAt);
 
   useEffect(() => {
     fetch('/api/backoffice/blog/categories')
@@ -100,7 +118,17 @@ export default function BlogForm({ initialData, postId }: BlogFormProps) {
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setSaving(true);
-    const payload = { ...form, tags: tagsStr.split(',').map(t => t.trim()).filter(Boolean) };
+    const parsedPublicationDate = new Date(form.createdAt);
+    if (isNaN(parsedPublicationDate.getTime())) {
+      addToast('Publication date is required', 'error');
+      setSaving(false);
+      return;
+    }
+    const payload = {
+      ...form,
+      tags: tagsStr.split(',').map(t => t.trim()).filter(Boolean),
+      createdAt: parsedPublicationDate.toISOString(),
+    };
     try {
       const res = postId
         ? await fetch(`/api/backoffice/blog/${postId}`, {
@@ -148,7 +176,7 @@ export default function BlogForm({ initialData, postId }: BlogFormProps) {
               >
                 ↺ Regenerate from title
               </button>
-              {form.slug && form.status === 'published' ? (
+              {form.slug && form.status === 'published' && !isScheduled ? (
                 <Link
                   href={`/blog/${form.slug}`}
                   target="_blank"
@@ -161,7 +189,7 @@ export default function BlogForm({ initialData, postId }: BlogFormProps) {
               ) : (
                 <span
                   className="text-xs px-2 py-1 rounded bg-slate-600 text-slate-300 cursor-not-allowed"
-                  title="Preview available when post is published and has a slug"
+                    title="Preview available when post is published, not scheduled, and has a slug"
                 >
                   Preview
                 </span>
@@ -196,11 +224,24 @@ export default function BlogForm({ initialData, postId }: BlogFormProps) {
           onChange={url => set('featuredImage', url)}
         />
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <label className="block text-slate-400 text-sm mb-1">Tags (comma-separated)</label>
             <input type="text" value={tagsStr} onChange={e => setTagsStr(e.target.value)}
               className="w-full px-3 py-2 bg-slate-600 border border-slate-500 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          </div>
+          <div>
+            <label className="block text-slate-400 text-sm mb-1">Publication Date</label>
+            <input
+              type="datetime-local"
+              required
+              value={toDateTimeLocalInputValue(form.createdAt)}
+              onChange={e => {
+                const nextDate = new Date(e.target.value);
+                if (!isNaN(nextDate.getTime())) set('createdAt', nextDate.toISOString());
+              }}
+              className="w-full px-3 py-2 bg-slate-600 border border-slate-500 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
           </div>
           <div>
             <label className="block text-slate-400 text-sm mb-1">Status</label>
@@ -209,6 +250,9 @@ export default function BlogForm({ initialData, postId }: BlogFormProps) {
               <option value="draft">Draft</option>
               <option value="published">Published</option>
             </select>
+            {isScheduled && (
+              <p className="mt-1 text-xs text-blue-300">This post is scheduled (future publication date).</p>
+            )}
           </div>
         </div>
 

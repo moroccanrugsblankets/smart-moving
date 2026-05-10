@@ -2,6 +2,12 @@
 
 import { useState, useEffect, useRef } from 'react';
 
+declare global {
+  interface Window {
+    dataLayer?: Array<Record<string, unknown>>;
+  }
+}
+
 interface EstimateResult {
   low: number;
   high: number;
@@ -34,6 +40,18 @@ function formatPhone(value: string) {
   if (d.length <= 3) return d;
   if (d.length <= 6) return `(${d.slice(0, 3)}) ${d.slice(3)}`;
   return `(${d.slice(0, 3)}) ${d.slice(3, 6)}-${d.slice(6)}`;
+}
+
+function pushLeadDataLayer(serviceType: 'moving' | 'cleaning', estimate?: string) {
+  if (typeof window === 'undefined') return;
+
+  window.dataLayer = window.dataLayer || [];
+  window.dataLayer.push({
+    event: 'generate_lead',
+    leadType: serviceType === 'moving' ? 'Moving' : 'Cleaning',
+    serviceType,
+    estimate,
+  });
 }
 
 const inputClass =
@@ -156,8 +174,10 @@ export default function Calculator() {
         }),
       });
       const data = await res.json();
-      if (data.success) setSubmitted(true);
-      else setLeadError(data.error || 'Submission failed. Please try again.');
+      if (data.success) {
+        pushLeadDataLayer(serviceType, estimate?.formatted);
+        setSubmitted(true);
+      } else setLeadError(data.error || 'Submission failed. Please try again.');
     } catch {
       setLeadError('Network error. Please try again.');
     }

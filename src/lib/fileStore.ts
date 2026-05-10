@@ -123,6 +123,7 @@ export interface FooterLink {
 
 export interface FooterSettingsData {
   description: string;
+  quickLinks: FooterLink[];
   customLinks: FooterLink[];
 }
 
@@ -927,9 +928,15 @@ export const emailTemplatesStore = {
   },
 };
 
+const defaultQuickLinks: FooterLink[] = [
+  { id: 'moving-cost', label: 'Moving Cost by City', url: '/moving-cost' },
+  { id: 'free-estimate-tool', label: 'Free Estimate Tool', url: '/#calculator' },
+];
+
 const defaultFooterSettings: FooterSettingsData = {
   description:
     'Cost estimates are based on U.S. Bureau of Labor Statistics data and regional market surveys (2026). Actual prices may vary.',
+  quickLinks: defaultQuickLinks,
   customLinks: [],
 };
 
@@ -939,20 +946,28 @@ export const footerSettingsStore = {
     if (!row) return defaultFooterSettings;
     return {
       description: row.description,
+      quickLinks: ((row.quickLinks ?? defaultQuickLinks) as unknown as FooterLink[]).map((link, index) => ({
+        id: link.id || `quick-link-${index}`,
+        label: link.label ?? '',
+        url: link.url ?? '',
+      })),
       customLinks: (row.customLinks ?? []) as unknown as FooterLink[],
     };
   },
   save: async (data: FooterSettingsData): Promise<void> => {
+    const quickLinks = data.quickLinks as unknown as Prisma.InputJsonValue;
     const links = data.customLinks as unknown as Prisma.InputJsonValue;
     await prisma.footerSettings.upsert({
       where: { id: 1 },
       update: {
         description: data.description,
+        quickLinks,
         customLinks: links,
       },
       create: {
         id: 1,
         description: data.description,
+        quickLinks,
         customLinks: links,
       },
     });

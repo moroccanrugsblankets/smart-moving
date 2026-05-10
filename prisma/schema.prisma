@@ -151,6 +151,7 @@ model Page {
 model FooterSettings {
   id          Int    @id @default(1)
   description String @default("Cost estimates are based on U.S. Bureau of Labor Statistics data and regional market surveys (2026). Actual prices may vary.")
+  quickLinks  Json   @default("[{\"id\":\"moving-cost\",\"label\":\"Moving Cost by City\",\"url\":\"/moving-cost\"},{\"id\":\"free-estimate-tool\",\"label\":\"Free Estimate Tool\",\"url\":\"/#calculator\"}]")
   customLinks Json   @default("[]")
 }
 

@@ -4,6 +4,11 @@ import { pagesStore, footerSettingsStore, type FooterLink } from '@/lib/fileStor
 const DEFAULT_DESCRIPTION =
   'Cost estimates are based on U.S. Bureau of Labor Statistics data and regional market surveys (2026). Actual prices may vary.';
 
+const DEFAULT_QUICK_LINKS = [
+  { href: '/moving-cost', label: 'Moving Cost by City' },
+  { href: '/#calculator', label: 'Free Estimate Tool' },
+];
+
 const DEFAULT_LEGAL_LINKS = [
   { href: '/privacy', label: 'Privacy Policy' },
   { href: '/do-not-sell', label: 'Do Not Sell My Personal Information (CCPA)' },
@@ -22,20 +27,31 @@ async function getFooterData() {
       .sort((a, b) => a.footerOrder - b.footerOrder)
       .map(p => ({ href: `/${p.slug}`, label: p.title }));
 
+    const quickLinks = (footerSettings.quickLinks ?? [])
+      .map(link => ({ href: link.url, label: link.label }))
+      .filter(link => link.href && link.label);
     const customLinks: FooterLink[] = footerSettings.customLinks ?? [];
     const allLegalLinks = [
       ...footerPages,
       ...customLinks.map(l => ({ href: l.url, label: l.label })),
     ];
 
-    return { description: footerSettings.description, legalLinks: allLegalLinks };
+    return {
+      description: footerSettings.description,
+      quickLinks: quickLinks.length > 0 ? quickLinks : DEFAULT_QUICK_LINKS,
+      legalLinks: allLegalLinks,
+    };
   } catch {
-    return { description: DEFAULT_DESCRIPTION, legalLinks: DEFAULT_LEGAL_LINKS };
+    return {
+      description: DEFAULT_DESCRIPTION,
+      quickLinks: DEFAULT_QUICK_LINKS,
+      legalLinks: DEFAULT_LEGAL_LINKS,
+    };
   }
 }
 
 export default async function Footer() {
-  const { description, legalLinks } = await getFooterData();
+  const { description, quickLinks, legalLinks } = await getFooterData();
 
   return (
     <footer className="bg-slate-800 text-slate-300 text-sm mt-16">
@@ -47,12 +63,11 @@ export default async function Footer() {
         <div>
           <p className="font-bold text-white mb-2">Quick Links</p>
           <ul className="space-y-1 text-xs">
-            <li>
-              <Link href="/moving-cost" className="hover:text-white">Moving Cost by City</Link>
-            </li>
-            <li>
-              <Link href="/#calculator" className="hover:text-white">Free Estimate Tool</Link>
-            </li>
+            {quickLinks.map(link => (
+              <li key={link.href}>
+                <Link href={link.href} className="hover:text-white">{link.label}</Link>
+              </li>
+            ))}
           </ul>
         </div>
         {legalLinks.length > 0 && (

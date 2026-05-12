@@ -46,12 +46,20 @@ function pushLeadDataLayer(serviceType: 'moving' | 'cleaning', estimate?: string
   if (typeof window === 'undefined') return;
 
   window.dataLayer = window.dataLayer || [];
-  window.dataLayer.push({
-    event: 'generate_lead',
-    leadType: serviceType === 'moving' ? 'Moving' : 'Cleaning',
-    serviceType,
-    estimate,
-  });
+  if (serviceType === 'moving') {
+    window.dataLayer.push({
+      event: 'lead_moving',
+      serviceType,
+      estimate,
+    });
+  } else if (serviceType === 'cleaning') {
+    window.dataLayer.push({
+      event: 'lead_cleaning',
+      serviceType,
+      estimate,
+    });
+  }
+
 }
 
 const inputClass =

@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import sanitizeHtml from 'sanitize-html';
 import { pagesStore, footerSettingsStore, type FooterLink } from '@/lib/fileStore';
 const DEFAULT_DESCRIPTION =
   'Cost estimates are based on U.S. Bureau of Labor Statistics data and regional market surveys (2026). Actual prices may vary.';
@@ -53,7 +54,7 @@ export default async function Footer() {
     <>
       <div
         style={{ fontSize: '11px', color: '#666666', lineHeight: '1.4', padding: '20px', textAlign: 'center', borderTop: '1px solid #e0e0e0' }}
-        dangerouslySetInnerHTML={{ __html: disclaimerHtml }}
+        dangerouslySetInnerHTML={{ __html: sanitizeHtml(disclaimerHtml, { allowedTags: sanitizeHtml.defaults.allowedTags.concat(['p', 'strong', 'em', 'a', 'br', 'ul', 'ol', 'li']), allowedAttributes: { '*': ['style'], a: ['href', 'target', 'rel'] } }) }}
       />
       <footer className="bg-slate-800 text-slate-300 text-sm mt-16">
         <div className="max-w-6xl mx-auto px-4 py-10 grid md:grid-cols-3 gap-8">

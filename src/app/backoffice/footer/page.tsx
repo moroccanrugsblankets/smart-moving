@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, FormEvent } from 'react';
+import sanitizeHtml from 'sanitize-html';
 import { Toast, useToast } from '@/components/Toast';
 
 interface PageItem {
@@ -158,7 +159,7 @@ export default function FooterSettingsPage() {
               <p className="text-slate-400 text-xs mb-1">Preview:</p>
               <div
                 className="text-xs text-slate-300 bg-slate-800 rounded p-3 border border-slate-600"
-                dangerouslySetInnerHTML={{ __html: settings.disclaimerHtml }}
+                dangerouslySetInnerHTML={{ __html: sanitizeHtml(settings.disclaimerHtml, { allowedTags: sanitizeHtml.defaults.allowedTags.concat(['p', 'strong', 'em', 'a', 'br', 'ul', 'ol', 'li']), allowedAttributes: { '*': ['style'], a: ['href', 'target', 'rel'] } }) }}
               />
             </div>
           )}

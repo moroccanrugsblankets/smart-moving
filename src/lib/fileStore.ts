@@ -125,6 +125,7 @@ export interface FooterSettingsData {
   description: string;
   quickLinks: FooterLink[];
   customLinks: FooterLink[];
+  disclaimerHtml: string;
 }
 
 export interface StoredLead {
@@ -941,6 +942,7 @@ const defaultFooterSettings: FooterSettingsData = {
     'Cost estimates are based on U.S. Bureau of Labor Statistics data and regional market surveys (2026). Actual prices may vary.',
   quickLinks: defaultQuickLinks,
   customLinks: [],
+  disclaimerHtml: '',
 };
 
 export const footerSettingsStore = {
@@ -955,6 +957,7 @@ export const footerSettingsStore = {
         url: link.url ?? '',
       })),
       customLinks: (row.customLinks ?? []) as unknown as FooterLink[],
+      disclaimerHtml: row.disclaimerHtml ?? '',
     };
   },
   save: async (data: FooterSettingsData): Promise<void> => {
@@ -966,12 +969,14 @@ export const footerSettingsStore = {
         description: data.description,
         quickLinks,
         customLinks: links,
+        disclaimerHtml: data.disclaimerHtml ?? '',
       },
       create: {
         id: 1,
         description: data.description,
         quickLinks,
         customLinks: links,
+        disclaimerHtml: data.disclaimerHtml ?? '',
       },
     });
   },

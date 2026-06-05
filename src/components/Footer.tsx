@@ -11,6 +11,9 @@ const DEFAULT_LEGAL_LINKS = [
   { href: '/do-not-sell', label: 'Do Not Sell My Personal Information (CCPA)' },
   { href: '/terms', label: 'Terms of Service' },
 ];
+const DEFAULT_DISCLAIMER_HTML =
+  '<p><strong>Disclaimer:</strong> GetMoveCost.com is a free service to assist homeowners in connecting with local service providers. All contractors/providers are independent and this site does not warrant or guarantee any work performed. It is the responsibility of the homeowner to verify that the hired contractor furnishes the necessary license and insurance required for the work being performed. All persons depicted in a photo or video are actors or models and not contractors listed on this site.</p>' +
+  '<p style="margin-top:5px">Same-day and 24/7 emergency services are subject to provider participation, location, technician availability, and demand. Availability is not guaranteed and may vary by market and appointment capacity.</p>';
 async function getFooterData() {
   try {
     const [pages, footerSettings] = await Promise.all([
@@ -33,23 +36,25 @@ async function getFooterData() {
       description: footerSettings.description,
       quickLinks: quickLinks.length > 0 ? quickLinks : DEFAULT_QUICK_LINKS,
       legalLinks: allLegalLinks,
+      disclaimerHtml: footerSettings.disclaimerHtml || DEFAULT_DISCLAIMER_HTML,
     };
   } catch {
     return {
       description: DEFAULT_DESCRIPTION,
       quickLinks: DEFAULT_QUICK_LINKS,
       legalLinks: DEFAULT_LEGAL_LINKS,
+      disclaimerHtml: DEFAULT_DISCLAIMER_HTML,
     };
   }
 }
 export default async function Footer() {
-  const { description, quickLinks, legalLinks } = await getFooterData();
+  const { description, quickLinks, legalLinks, disclaimerHtml } = await getFooterData();
   return (
     <>
-      <div style={{ fontSize: '11px', color: '#666666', lineHeight: '1.4', padding: '20px', textAlign: 'center', borderTop: '1px solid #e0e0e0' }}>
-        <p><strong>Disclaimer:</strong> GetMoveCost.com is a free service to assist homeowners in connecting with local service providers. All contractors/providers are independent and this site does not warrant or guarantee any work performed. It is the responsibility of the homeowner to verify that the hired contractor furnishes the necessary license and insurance required for the work being performed. All persons depicted in a photo or video are actors or models and not contractors listed on this site.</p>
-        <p style={{ marginTop: '5px' }}>Same-day and 24/7 emergency services are subject to provider participation, location, technician availability, and demand. Availability is not guaranteed and may vary by market and appointment capacity.</p>
-      </div>
+      <div
+        style={{ fontSize: '11px', color: '#666666', lineHeight: '1.4', padding: '20px', textAlign: 'center', borderTop: '1px solid #e0e0e0' }}
+        dangerouslySetInnerHTML={{ __html: disclaimerHtml }}
+      />
       <footer className="bg-slate-800 text-slate-300 text-sm mt-16">
         <div className="max-w-6xl mx-auto px-4 py-10 grid md:grid-cols-3 gap-8">
           <div>
@@ -81,7 +86,7 @@ export default async function Footer() {
         </div>
         <div className="border-t border-slate-700 text-center py-4 text-xs text-slate-500">
           © 2026 GetMoveCost.com. All rights reserved. |{' '}
-          
+          <a
             href="https://www.bls.gov"
             target="_blank"
             rel="noopener noreferrer"

@@ -20,11 +20,12 @@ interface FooterSettingsData {
   description: string;
   quickLinks: FooterLink[];
   customLinks: FooterLink[];
+  disclaimerHtml: string;
 }
 
 export default function FooterSettingsPage() {
   const [pages, setPages] = useState<PageItem[]>([]);
-  const [settings, setSettings] = useState<FooterSettingsData>({ description: '', quickLinks: [], customLinks: [] });
+  const [settings, setSettings] = useState<FooterSettingsData>({ description: '', quickLinks: [], customLinks: [], disclaimerHtml: '' });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const { toasts, addToast, removeToast } = useToast();
@@ -132,6 +133,37 @@ export default function FooterSettingsPage() {
       <h1 className="text-2xl font-bold text-white">Footer Settings</h1>
 
       <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Disclaimer HTML */}
+        <div className="bg-slate-700 rounded-lg p-6 space-y-4">
+          <h2 className="text-white font-semibold">Disclaimer Block</h2>
+          <p className="text-slate-400 text-xs">
+            HTML content displayed above the footer on every front-office page. You can use standard HTML tags (e.g.&nbsp;
+            <code className="text-slate-300">&lt;p&gt;</code>,&nbsp;
+            <code className="text-slate-300">&lt;strong&gt;</code>,&nbsp;
+            <code className="text-slate-300">&lt;a&gt;</code>).
+            Leave empty to hide the disclaimer.
+          </p>
+          <div>
+            <label className="block text-slate-400 text-sm mb-1">Disclaimer HTML</label>
+            <textarea
+              value={settings.disclaimerHtml}
+              onChange={e => setSettings(prev => ({ ...prev, disclaimerHtml: e.target.value }))}
+              rows={8}
+              placeholder='<p><strong>Disclaimer:</strong> …</p>'
+              className="w-full px-3 py-2 bg-slate-600 border border-slate-500 rounded text-white text-sm font-mono focus:outline-none focus:ring-2 focus:ring-blue-500 resize-vertical"
+            />
+          </div>
+          {settings.disclaimerHtml && (
+            <div>
+              <p className="text-slate-400 text-xs mb-1">Preview:</p>
+              <div
+                className="text-xs text-slate-300 bg-slate-800 rounded p-3 border border-slate-600"
+                dangerouslySetInnerHTML={{ __html: settings.disclaimerHtml }}
+              />
+            </div>
+          )}
+        </div>
+
         {/* Description */}
         <div className="bg-slate-700 rounded-lg p-6 space-y-4">
           <h2 className="text-white font-semibold">Footer Description</h2>

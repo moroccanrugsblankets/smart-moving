@@ -71,7 +71,11 @@ model Setting {
   socialLinks    Json   @default("{}")
   marketRates    Json?
   gtmId          String @default("")
-  affiliatePhone String @default("1-844-578-3057")
+  affiliatePhone       String @default("1-844-578-3057")
+  affiliateTitle       String @default("Moving Into a New House?")
+  affiliateDescription String @default("Don't let unexpected repairs or lock issues ruin your moving day. Get a certified local technician to secure your new home immediately.")
+  affiliateButtonText  String @default("Call Our 24/7 Hotline:")
+  affiliateFooterText  String @default("Free Quotes & Immediate Availability Verification")
 }
 
 /// Singleton row (id = 1) — SMTP configuration

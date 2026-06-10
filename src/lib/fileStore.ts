@@ -30,6 +30,7 @@ export interface Settings {
     instagram?: string;
   };
   gtmId: string;
+  affiliatePhone: string;
 }
 
 export interface BlogPost {
@@ -188,6 +189,7 @@ const defaultSettings: Settings = {
   adminEmail: 'admin@getmovecost.com',
   socialLinks: {},
   gtmId: '',
+  affiliatePhone: '1-844-578-3057',
 };
 
 const defaultEmailConfig: EmailConfig = {
@@ -302,6 +304,7 @@ export const settingsStore = {
       adminEmail: row.adminEmail,
       socialLinks: (row.socialLinks ?? {}) as Settings['socialLinks'],
       gtmId: row.gtmId ?? '',
+      affiliatePhone: row.affiliatePhone ?? '1-844-578-3057',
     };
   },
   save: async (settings: Settings): Promise<void> => {
@@ -316,6 +319,7 @@ export const settingsStore = {
         adminEmail: settings.adminEmail,
         socialLinks: settings.socialLinks,
         gtmId: settings.gtmId ?? '',
+        affiliatePhone: settings.affiliatePhone ?? '1-844-578-3057',
       },
       create: {
         id: 1,
@@ -327,6 +331,7 @@ export const settingsStore = {
         adminEmail: settings.adminEmail,
         socialLinks: settings.socialLinks,
         gtmId: settings.gtmId ?? '',
+        affiliatePhone: settings.affiliatePhone ?? '1-844-578-3057',
       },
     });
   },

@@ -86,6 +86,14 @@ export default function Calculator() {
   });
   const [submitted, setSubmitted] = useState(false);
   const [leadError, setLeadError] = useState('');
+  const [affiliatePhone, setAffiliatePhone] = useState('1-844-578-3057');
+
+  useEffect(() => {
+    fetch('/api/affiliate')
+      .then(r => r.json())
+      .then(data => { if (data.affiliatePhone) setAffiliatePhone(data.affiliatePhone); })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     if (serviceType !== 'moving') return;
@@ -565,13 +573,13 @@ export default function Calculator() {
                 <span className="text-blue-600 font-medium">new home</span> immediately.
               </p>
               <a
-                href="tel:16012034110"
+                href={`tel:${affiliatePhone.replace(/\D/g, '')}`}
                 className="inline-flex items-center justify-center gap-3 w-full bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white font-bold py-4 px-6 rounded-full shadow-lg transition-all"
               >
                 <svg className="w-5 h-5 text-red-400 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V20a1 1 0 01-1 1C10.61 21 3 13.39 3 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.26.2 2.47.57 3.58a1 1 0 01-.24 1.01l-2.21 2.2z" />
                 </svg>
-                Call Our 24/7 Hotline:&nbsp;1-601-203-4110
+                Call Our 24/7 Hotline:&nbsp;{affiliatePhone}
               </a>
               <p className="text-xs text-slate-400">Free Quotes &amp; Immediate Availability Verification</p>
             </div>

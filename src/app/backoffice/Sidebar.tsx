@@ -18,6 +18,7 @@ const NAV_ITEMS: NavItem[] = [
   { label: 'Pages', href: '/backoffice/pages', icon: '📄' },
   { label: 'Footer Settings', href: '/backoffice/footer', icon: '🔗', roles: ['admin'] },
   { label: 'Market Data', href: '/backoffice/market-data', icon: '🗺️', roles: ['admin'] },
+  { label: 'Affiliate', href: '/backoffice/affiliate', icon: '📞', roles: ['admin'] },
   { label: 'Settings', href: '/backoffice/settings', icon: '⚙️', roles: ['admin'] },
   { label: 'Users', href: '/backoffice/users', icon: '👤', roles: ['admin'] },
   { label: 'Email Config', href: '/backoffice/email/config', icon: '📧', roles: ['admin'] },

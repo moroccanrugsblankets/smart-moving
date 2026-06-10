@@ -23,7 +23,7 @@ export default function AffiliatePage() {
         setAffiliateFooterText(data.affiliateFooterText ?? '');
       })
       .catch(() => addToast('Failed to load affiliate settings', 'error'));
-  }, []);
+  }, [addToast]);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();

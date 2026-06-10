@@ -31,6 +31,10 @@ export interface Settings {
   };
   gtmId: string;
   affiliatePhone: string;
+  affiliateTitle: string;
+  affiliateDescription: string;
+  affiliateButtonText: string;
+  affiliateFooterText: string;
 }
 
 export interface BlogPost {
@@ -190,6 +194,10 @@ const defaultSettings: Settings = {
   socialLinks: {},
   gtmId: '',
   affiliatePhone: '1-844-578-3057',
+  affiliateTitle: 'Moving Into a New House?',
+  affiliateDescription: "Don't let unexpected repairs or lock issues ruin your moving day. Get a certified local technician to secure your new home immediately.",
+  affiliateButtonText: 'Call Our 24/7 Hotline:',
+  affiliateFooterText: 'Free Quotes & Immediate Availability Verification',
 };
 
 const defaultEmailConfig: EmailConfig = {
@@ -305,6 +313,10 @@ export const settingsStore = {
       socialLinks: (row.socialLinks ?? {}) as Settings['socialLinks'],
       gtmId: row.gtmId ?? '',
       affiliatePhone: row.affiliatePhone ?? '1-844-578-3057',
+      affiliateTitle: row.affiliateTitle ?? 'Moving Into a New House?',
+      affiliateDescription: row.affiliateDescription ?? "Don't let unexpected repairs or lock issues ruin your moving day. Get a certified local technician to secure your new home immediately.",
+      affiliateButtonText: row.affiliateButtonText ?? 'Call Our 24/7 Hotline:',
+      affiliateFooterText: row.affiliateFooterText ?? 'Free Quotes & Immediate Availability Verification',
     };
   },
   save: async (settings: Settings): Promise<void> => {
@@ -320,6 +332,10 @@ export const settingsStore = {
         socialLinks: settings.socialLinks,
         gtmId: settings.gtmId ?? '',
         affiliatePhone: settings.affiliatePhone ?? '1-844-578-3057',
+        affiliateTitle: settings.affiliateTitle ?? 'Moving Into a New House?',
+        affiliateDescription: settings.affiliateDescription ?? "Don't let unexpected repairs or lock issues ruin your moving day. Get a certified local technician to secure your new home immediately.",
+        affiliateButtonText: settings.affiliateButtonText ?? 'Call Our 24/7 Hotline:',
+        affiliateFooterText: settings.affiliateFooterText ?? 'Free Quotes & Immediate Availability Verification',
       },
       create: {
         id: 1,
@@ -332,6 +348,10 @@ export const settingsStore = {
         socialLinks: settings.socialLinks,
         gtmId: settings.gtmId ?? '',
         affiliatePhone: settings.affiliatePhone ?? '1-844-578-3057',
+        affiliateTitle: settings.affiliateTitle ?? 'Moving Into a New House?',
+        affiliateDescription: settings.affiliateDescription ?? "Don't let unexpected repairs or lock issues ruin your moving day. Get a certified local technician to secure your new home immediately.",
+        affiliateButtonText: settings.affiliateButtonText ?? 'Call Our 24/7 Hotline:',
+        affiliateFooterText: settings.affiliateFooterText ?? 'Free Quotes & Immediate Availability Verification',
       },
     });
   },

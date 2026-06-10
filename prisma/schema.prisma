@@ -68,9 +68,10 @@ model Setting {
   logoUrlFooter String @default("")
   faviconUrl    String @default("")
   adminEmail    String @default("admin@getmovecost.com")
-  socialLinks   Json   @default("{}")
-  marketRates   Json?
-  gtmId         String @default("")
+  socialLinks    Json   @default("{}")
+  marketRates    Json?
+  gtmId          String @default("")
+  affiliatePhone String @default("1-844-578-3057")
 }
 
 /// Singleton row (id = 1) — SMTP configuration

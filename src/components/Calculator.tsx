@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import MovingChecklist from '@/components/MovingChecklist';
 
 declare global {
   interface Window {
@@ -591,6 +592,9 @@ export default function Calculator() {
               </a>
               <p className="text-xs text-slate-400">{affiliateFooterText}</p>
             </div>
+
+            {/* Moving Checklist — pre-move-in upsell cards */}
+            <MovingChecklist />
           </div>
         )}
       </div>
